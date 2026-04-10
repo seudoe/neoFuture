@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { X, CreditCard, MapPin, User, Phone, Mail, CheckCircle } from 'lucide-react';
 
 interface CartItem {
@@ -19,6 +19,7 @@ interface PaymentPortalProps {
   onClose: () => void;
   cartItems: CartItem[];
   userId: number;
+  user?: { name: string; email: string; phone_number: string };
   onPaymentSuccess: () => void;
 }
 
@@ -26,21 +27,74 @@ export default function PaymentPortal({
   isOpen, 
   onClose, 
   cartItems, 
-  userId, 
+  userId,
+  user,
   onPaymentSuccess 
 }: PaymentPortalProps) {
-  const [step, setStep] = useState(1); // 1: Details, 2: Payment, 3: Success
+  const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [locationLoading, setLocationLoading] = useState(false);
   const [formData, setFormData] = useState({
-    fullName: '',
-    email: '',
-    phone: '',
+    fullName: user?.name || '',
+    email: user?.email || '',
+    phone: user?.phone_number || '',
     address: '',
     city: '',
     pincode: '',
     notes: '',
     paymentMethod: 'card'
   });
+
+  // Reset and fetch location when portal opens
+  useEffect(() => {
+    if (isOpen) {
+      setStep(1);
+      setFormData(prev => ({
+        ...prev,
+        fullName: user?.name || '',
+        email: user?.email || '',
+        phone: user?.phone_number || '',
+        address: '',
+        city: '',
+        pincode: '',
+        notes: '',
+        paymentMethod: 'card'
+      }));
+      fetchLocationData();
+    }
+  }, [isOpen]);
+
+  const fetchLocationData = () => {
+    if (!navigator.geolocation) return;
+    setLocationLoading(true);
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
+          const { latitude, longitude } = position.coords;
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=14&addressdetails=1`
+          );
+          if (res.ok) {
+            const data = await res.json();
+            const addr = data.address || {};
+            const city = addr.city || addr.town || addr.village || addr.county || '';
+            const pincode = addr.postcode || '';
+            setFormData(prev => ({
+              ...prev,
+              city: city,
+              pincode: pincode
+            }));
+          }
+        } catch {
+          // silently fail — user can fill manually
+        } finally {
+          setLocationLoading(false);
+        }
+      },
+      () => setLocationLoading(false),
+      { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 }
+    );
+  };
 
   if (!isOpen) return null;
 
@@ -214,23 +268,33 @@ export default function PaymentPortal({
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">City *</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    City *
+                    {locationLoading && <span className="ml-2 text-xs text-blue-500">📍 detecting...</span>}
+                    {!locationLoading && formData.city && <span className="ml-2 text-xs text-green-500">📍 auto-filled</span>}
+                  </label>
                   <input
                     type="text"
                     name="city"
                     value={formData.city}
                     onChange={handleInputChange}
+                    placeholder={locationLoading ? 'Detecting...' : 'City'}
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">PIN Code *</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    PIN Code *
+                    {locationLoading && <span className="ml-2 text-xs text-blue-500">📍 detecting...</span>}
+                    {!locationLoading && formData.pincode && <span className="ml-2 text-xs text-green-500">📍 auto-filled</span>}
+                  </label>
                   <input
                     type="text"
                     name="pincode"
                     value={formData.pincode}
                     onChange={handleInputChange}
+                    placeholder={locationLoading ? 'Detecting...' : 'PIN Code'}
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
                     required
                   />

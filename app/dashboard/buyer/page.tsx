@@ -1371,6 +1371,7 @@ export default function BuyerDashboard() {
         onClose={() => setShowPaymentPortal(false)}
         cartItems={cartItems}
         userId={user?.id || 0}
+        user={user ? { name: user.name, email: user.email, phone_number: user.phone_number } : undefined}
         onPaymentSuccess={() => {
           fetchCart(user?.id || 0);
           fetchOrders(user?.id || 0);

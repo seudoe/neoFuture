@@ -279,6 +279,8 @@ export default function FarmerOrderRequests({ userId }: FarmerOrderRequestsProps
               <div key={request.id} className={`border rounded-xl p-6 ${
                 request.is_scheduled 
                   ? 'border-purple-200 bg-gradient-to-r from-purple-50 to-white' 
+                  : request.status !== 'open'
+                  ? 'border-gray-200 bg-gray-50 opacity-75'
                   : 'border-gray-200'
               }`}>
                 {/* Scheduled Order Badge */}
@@ -315,6 +317,13 @@ export default function FarmerOrderRequests({ userId }: FarmerOrderRequestsProps
                   </div>
                   
                   <div className="flex flex-col items-end gap-2">
+                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                      request.status === 'open' ? 'bg-green-100 text-green-800' :
+                      request.status === 'closed' ? 'bg-gray-100 text-gray-600' :
+                      'bg-yellow-100 text-yellow-800'
+                    }`}>
+                      {request.status}
+                    </span>
                     {userStatus && (
                       <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(userStatus)}`}>
                         Your application: {userStatus}

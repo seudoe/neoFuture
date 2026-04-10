@@ -131,8 +131,6 @@ export async function GET(request: NextRequest) {
             status
           )
         `)
-        .eq('status', 'open')
-        .gte('by_date', new Date().toISOString().split('T')[0])
         .order('created_at', { ascending: false });
 
       if (error) {

@@ -221,11 +221,13 @@ export default function BrowseProductsPage() {
                   }`}
                   onClick={() => { setSelectedProduct(product); setShowProductDetails(true); }}
                 >
-                  {/* Recommended badge */}
+                  {/* Recommended badge — sits above the image in normal flow */}
                   {isRecommended && (
-                    <div className="absolute top-3 right-3 flex items-center gap-1 bg-blue-600 text-white text-xs px-2 py-0.5 rounded-full">
-                      <Sparkles className="w-3 h-3" />
-                      For you
+                    <div className="flex justify-end mb-2">
+                      <div className="flex items-center gap-1 bg-blue-600 text-white text-xs px-2 py-0.5 rounded-full">
+                        <Sparkles className="w-3 h-3" />
+                        For you
+                      </div>
                     </div>
                   )}
 

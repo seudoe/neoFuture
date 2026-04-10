@@ -66,11 +66,13 @@ export default function Dashboard({ userType, userId, products = [], orders = []
   const [recentActivity, setRecentActivity] = useState<any[]>([]);
   const [liveStats, setLiveStats] = useState<any>(userStats || null);
   const [liveOrders, setLiveOrders] = useState<any[]>(orders);
+  const [liveProducts, setLiveProducts] = useState<any[]>(products);
 
   useEffect(() => {
     if (userId) {
       fetchLiveStats();
       fetchLiveOrders();
+      if (userType === 'farmer') fetchLiveProducts();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
@@ -91,10 +93,18 @@ export default function Dashboard({ userType, userId, products = [], orders = []
     } catch {}
   };
 
+  const fetchLiveProducts = async () => {
+    try {
+      const res = await fetch(`/api/products?seller_id=${userId}`);
+      const data = await res.json();
+      setLiveProducts(data.products || []);
+    } catch {}
+  };
+
   useEffect(() => {
     if (userId) fetchRecentActivity();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userId, liveOrders.length, products.length]);
+  }, [userId, liveOrders.length, liveProducts.length]);
 
   const fetchRecentActivity = async () => {
     const activities: any[] = [];
@@ -117,7 +127,7 @@ export default function Dashboard({ userType, userId, products = [], orders = []
 
     // Add product activities for farmers
     if (userType === 'farmer') {
-      products.slice(0, 2).forEach((product: any) => {
+      liveProducts.slice(0, 2).forEach((product: any) => {
         activities.push({
           id: `product-${product.id}`,
           type: 'product',
@@ -210,9 +220,10 @@ export default function Dashboard({ userType, userId, products = [], orders = []
   };
 
   // Calculate statistics
-  const totalStock = products.reduce((sum, p) => sum + (p.quantity || 0), 0);
-  const avgPrice = products.length > 0 ? products.reduce((sum, p) => sum + (p.price_single || 0), 0) / products.length : 0;
-  const activeListings = products.filter(p => p.status === 'active').length;
+  const totalStock = liveProducts.reduce((sum, p) => sum + (p.quantity || 0), 0);
+  const avgPrice = liveProducts.length > 0 ? liveProducts.reduce((sum, p) => sum + (p.price_single || 0), 0) / liveProducts.length : 0;
+  const activeListings = liveProducts.filter(p => p.status === 'active').length;
+  const stockProgress = Math.min((totalStock / 1000) * 100, 100);
   const completedOrders = liveOrders.filter(o => o.status === 'delivered').length;
   const pendingOrders = liveOrders.filter(o => o.status === 'pending').length;
   const acceptedOrders = liveOrders.filter(o => o.status !== 'cancelled').length;
@@ -230,8 +241,6 @@ export default function Dashboard({ userType, userId, products = [], orders = []
     .filter(o => o.status !== 'cancelled')
     .reduce((sum, o) => sum + (o.total_price || o.total_amount || 0), 0);
 
-  // Progress calculations
-  const stockProgress = Math.min((totalStock / 1000) * 100, 100);
   const ratingProgress = (avgRating / 5) * 100;
   const orderCompletionRate = acceptedOrders > 0 ? (completedOrders / acceptedOrders) * 100 : 0;
   const revenueProgress = farmerRevenueGoal > 0 ? Math.min((totalRevenue / farmerRevenueGoal) * 100, 100) : 0;

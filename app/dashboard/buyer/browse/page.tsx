@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useI18n } from '@/lib/i18n/context';
-import { ShoppingCart, ImageIcon } from 'lucide-react';
+import { ShoppingCart, ImageIcon, Search } from 'lucide-react';
 import { useDashboardData, useProducts, useCart } from '@/lib/hooks/useDashboardData';
 import ProductDetails from '@/components/ProductDetails';
 
@@ -41,16 +41,19 @@ export default function BrowseProductsPage() {
           </div>
         </div>
 
-        {/* Mobile Search */}
-        <div className="lg:hidden mb-6">
+        {/* Search Bar */}
+        <div className="relative mb-6">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
           <input
             type="text"
-            placeholder={t('placeholders.searchProducts')}
+            placeholder="Search by name, category or seller..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 placeholder-gray-500"
+            className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 placeholder-gray-400"
           />
         </div>
+
+        {/* Mobile Search removed — search bar above is always visible */}
 
         {loading ? (
           <div className="text-center py-8">

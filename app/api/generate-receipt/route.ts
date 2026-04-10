@@ -63,6 +63,11 @@ export async function POST(request: NextRequest) {
         o.total_price as total_amount,
         o.unit_price,
         o.tracking_code,
+        o.ordered_quantity,
+        o.delivered_quantity,
+        o.wasted_quantity,
+        o.original_amount,
+        o.adjusted_amount,
         buyer.name as buyer_name,
         buyer.email as buyer_email,
         seller.name as farmer_name,
@@ -90,7 +95,8 @@ export async function POST(request: NextRequest) {
     console.log('Order data fetched:', { 
       orderId: orderData.id, 
       buyer: orderData.buyer_name, 
-      farmer: orderData.farmer_name 
+      farmer: orderData.farmer_name,
+      hasWastage: orderData.wasted_quantity > 0
     });
 
     // Prepare receipt data
@@ -106,12 +112,18 @@ export async function POST(request: NextRequest) {
       products: [
         {
           name: orderData.product_name,
-          quantity: orderData.quantity,
+          quantity: orderData.delivered_quantity || orderData.ordered_quantity || orderData.quantity,
           price: parseFloat(orderData.unit_price),
         },
       ],
-      totalAmount: parseFloat(orderData.total_amount),
+      totalAmount: orderData.adjusted_amount ? parseFloat(orderData.adjusted_amount) : parseFloat(orderData.total_amount),
       trackingCode: orderData.tracking_code,
+      // Wastage fields
+      orderedQuantity: orderData.ordered_quantity,
+      deliveredQuantity: orderData.delivered_quantity,
+      wastedQuantity: orderData.wasted_quantity || 0,
+      originalAmount: orderData.original_amount ? parseFloat(orderData.original_amount) : parseFloat(orderData.total_amount),
+      adjustedAmount: orderData.adjusted_amount ? parseFloat(orderData.adjusted_amount) : parseFloat(orderData.total_amount),
     };
 
     console.log('Generating PDF...');

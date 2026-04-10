@@ -16,6 +16,12 @@ interface ReceiptData {
   }>;
   totalAmount: number;
   trackingCode?: string;
+  // Wastage fields
+  orderedQuantity?: number;
+  deliveredQuantity?: number;
+  wastedQuantity?: number;
+  originalAmount?: number;
+  adjustedAmount?: number;
 }
 
 export function generateReceiptPDF(data: ReceiptData): Blob {
@@ -110,6 +116,21 @@ export function generateReceiptPDF(data: ReceiptData): Blob {
     yPos += 7;
   });
   
+  // Wastage Information (if applicable)
+  if (data.wastedQuantity && data.wastedQuantity > 0) {
+    yPos += 3;
+    doc.setFillColor(255, 243, 224);
+    doc.rect(20, yPos - 5, 170, 8, 'F');
+    
+    doc.setTextColor(234, 88, 12);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Wastage Adjustment', 25, yPos);
+    doc.text(`-${data.wastedQuantity} kg`, 110, yPos);
+    doc.text(`-Rs ${(data.wastedQuantity * data.products[0].price).toFixed(2)}`, 170, yPos);
+    doc.setTextColor(0, 0, 0);
+    yPos += 7;
+  }
+  
   // Total
   yPos += 5;
   doc.setDrawColor(0, 0, 0);
@@ -118,8 +139,27 @@ export function generateReceiptPDF(data: ReceiptData): Blob {
   yPos += 8;
   doc.setFontSize(14);
   doc.setFont('helvetica', 'bold');
-  doc.text('Total Amount:', 120, yPos);
-  doc.text(`Rs ${data.totalAmount.toFixed(2)}`, 170, yPos);
+  
+  if (data.wastedQuantity && data.wastedQuantity > 0) {
+    // Show original and adjusted amounts
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(150, 150, 150);
+    doc.text('Original Amount:', 120, yPos);
+    doc.text(`Rs ${data.originalAmount?.toFixed(2)}`, 170, yPos);
+    
+    yPos += 6;
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(0, 0, 0);
+    doc.text('Adjusted Amount:', 120, yPos);
+    doc.setTextColor(22, 163, 74);
+    doc.text(`Rs ${data.adjustedAmount?.toFixed(2)}`, 170, yPos);
+    doc.setTextColor(0, 0, 0);
+  } else {
+    doc.text('Total Amount:', 120, yPos);
+    doc.text(`Rs ${data.totalAmount.toFixed(2)}`, 170, yPos);
+  }
   
   // Tracking Code
   if (data.trackingCode) {

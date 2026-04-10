@@ -3,12 +3,13 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useI18n } from '@/lib/i18n/context';
-import { Package, Star, Phone, ImageIcon, QrCode } from 'lucide-react';
+import { Package, Star, Phone, ImageIcon, QrCode, AlertTriangle } from 'lucide-react';
 import { useDashboardData, useOrders, useRatings } from '@/lib/hooks/useDashboardData';
 import RatingModal from '@/components/RatingModal';
 import ReorderModal from '@/components/ReorderModal';
 import OrderDetailsModal from '@/components/OrderDetailsModal';
 import ReceiptButton from '@/components/ReceiptButton';
+import WastageReportModal from '@/components/WastageReportModal';
 import toast from 'react-hot-toast';
 
 export default function MyOrdersPage() {
@@ -25,6 +26,8 @@ export default function MyOrdersPage() {
   const [selectedOrderForReorder, setSelectedOrderForReorder] = useState<any>(null);
   const [showTrackingModal, setShowTrackingModal] = useState(false);
   const [selectedOrderForTracking, setSelectedOrderForTracking] = useState<any>(null);
+  const [showWastageModal, setShowWastageModal] = useState(false);
+  const [selectedOrderForWastage, setSelectedOrderForWastage] = useState<any>(null);
 
   // Fetch ratings for orders
   useState(() => {
@@ -212,8 +215,20 @@ export default function MyOrdersPage() {
                   </div>
                   <div>
                     <p className="text-sm text-gray-700">Quantity & Price</p>
-                    <p className="font-medium text-red-400">{order.quantity}kg × ₹{order.unit_price}</p>
-                    <p className="text-lg font-semibold text-blue-600">₹{order.total_price}</p>
+                    {order.wasted_quantity && order.wasted_quantity > 0 ? (
+                      <>
+                        <p className="text-xs text-gray-500">Ordered: {order.ordered_quantity || order.quantity}kg</p>
+                        <p className="font-medium text-green-600">Delivered: {order.delivered_quantity}kg × Rs {order.unit_price}</p>
+                        <p className="text-xs text-red-500">Wasted: {order.wasted_quantity}kg</p>
+                        <p className="text-lg font-semibold text-green-600">Rs {order.adjusted_amount || order.total_price}</p>
+                        <p className="text-xs text-gray-500 line-through">Was: Rs {order.original_amount || order.total_price}</p>
+                      </>
+                    ) : (
+                      <>
+                        <p className="font-medium text-red-400">{order.quantity}kg × Rs {order.unit_price}</p>
+                        <p className="text-lg font-semibold text-blue-600">Rs {order.total_price}</p>
+                      </>
+                    )}
                   </div>
                   <div>
                     <p className="text-sm text-gray-700">Delivery Address</p>
@@ -225,6 +240,18 @@ export default function MyOrdersPage() {
                   <div className="mb-4">
                     <p className="text-sm text-gray-600">Special Instructions</p>
                     <p className="text-sm text-gray-700">{order.notes}</p>
+                  </div>
+                )}
+
+                {order.wasted_quantity && order.wasted_quantity > 0 && (
+                  <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <div className="flex items-center gap-2 text-sm">
+                      <AlertTriangle className="w-4 h-4 text-yellow-600" />
+                      <span className="font-medium text-yellow-900">
+                        Wastage Reported: {order.wasted_quantity}kg - 
+                        You saved Rs {((order.original_amount || order.total_price) - (order.adjusted_amount || order.total_price)).toFixed(2)}
+                      </span>
+                    </div>
                   </div>
                 )}
 
@@ -257,6 +284,18 @@ export default function MyOrdersPage() {
                   >
                     {orderRatings[order.id] ? 'Update Rating' : 'Rate & Review'}
                   </button>
+                  
+                  {order.status === 'shipped' && (
+                    <button 
+                      onClick={() => {
+                        setSelectedOrderForWastage(order);
+                        setShowWastageModal(true);
+                      }}
+                      className="px-4 py-2 bg-purple-600 text-white rounded-lg text-sm hover:bg-purple-700 transition-colors"
+                    >
+                      Verify & Mark as Delivered
+                    </button>
+                  )}
                   
                   {order.status === 'delivered' && (
                     <button 
@@ -407,6 +446,20 @@ export default function MyOrdersPage() {
           }}
           onConfirm={handleConfirmReorder}
           order={selectedOrderForReorder}
+        />
+      )}
+
+      {showWastageModal && selectedOrderForWastage && (
+        <WastageReportModal
+          isOpen={showWastageModal}
+          onClose={() => {
+            setShowWastageModal(false);
+            setSelectedOrderForWastage(null);
+          }}
+          order={selectedOrderForWastage}
+          onSuccess={() => {
+            refetch();
+          }}
         />
       )}
     </>

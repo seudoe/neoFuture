@@ -7,6 +7,7 @@ import { useDashboardData, useOrders, useRatings } from '@/lib/hooks/useDashboar
 import RatingModal from '@/components/RatingModal';
 import OrderDetailsModal from '@/components/OrderDetailsModal';
 import ReceiptButton from '@/components/ReceiptButton';
+import WastageInfo from '@/components/WastageInfo';
 import toast from 'react-hot-toast';
 
 export default function FarmerOrdersPage() {
@@ -160,8 +161,20 @@ export default function FarmerOrdersPage() {
                   </div>
                   <div>
                     <p className="text-sm text-gray-700">Quantity & Price</p>
-                    <p className="font-medium text-red-400">{order.quantity}kg × ₹{order.unit_price}</p>
-                    <p className="text-lg font-semibold text-green-600">₹{order.total_price}</p>
+                    {order.wasted_quantity && order.wasted_quantity > 0 ? (
+                      <>
+                        <p className="text-xs text-gray-500">Ordered: {order.ordered_quantity || order.quantity}kg</p>
+                        <p className="font-medium text-green-600">Delivered: {order.delivered_quantity}kg × Rs {order.unit_price}</p>
+                        <p className="text-xs text-red-500">Wasted: {order.wasted_quantity}kg</p>
+                        <p className="text-lg font-semibold text-green-600">Rs {order.adjusted_amount || order.total_price}</p>
+                        <p className="text-xs text-gray-500 line-through">Was: Rs {order.original_amount || order.total_price}</p>
+                      </>
+                    ) : (
+                      <>
+                        <p className="font-medium text-red-400">{order.quantity}kg × Rs {order.unit_price}</p>
+                        <p className="text-lg font-semibold text-green-600">Rs {order.total_price}</p>
+                      </>
+                    )}
                   </div>
                   <div>
                     <p className="text-sm text-gray-700">Delivery Address</p>
@@ -199,14 +212,6 @@ export default function FarmerOrdersPage() {
                       className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition-colors"
                     >
                       Mark as Shipped
-                    </button>
-                  )}
-                  {order.status === 'shipped' && (
-                    <button 
-                      onClick={() => updateOrderStatus(order.id, 'delivered')}
-                      className="px-4 py-2 bg-purple-600 text-white rounded-lg text-sm hover:bg-purple-700 transition-colors"
-                    >
-                      Mark as Delivered
                     </button>
                   )}
                   
@@ -310,6 +315,8 @@ export default function FarmerOrdersPage() {
                     </div>
                   ) : null;
                 })()}
+
+                <WastageInfo order={order} />
               </div>
             ))}
           </div>

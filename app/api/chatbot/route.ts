@@ -79,13 +79,21 @@ export async function POST(request: NextRequest) {
       },
       body: JSON.stringify({
         messages: messages,
-        model: 'llama-3.3-70b-versatile',
-        temperature: 0.5, // Lower temperature makes it follow instructions more strictly
+        model: 'llama-3.1-8b-instant',
+        temperature: 0.5,
         max_tokens: 1024,
       })
     });
 
     const data = await response.json();
+    
+    if (data.error) {
+      console.error('Groq API error:', data.error);
+      return NextResponse.json({ 
+        response: "I'm temporarily unavailable due to high demand. Please try again in a few minutes." 
+      });
+    }
+    
     const botResponse = data.choices?.[0]?.message?.content;
 
     return NextResponse.json({ response: botResponse });

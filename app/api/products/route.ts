@@ -16,8 +16,12 @@ export async function GET(request: NextRequest) {
           phone_number
         )
       `)
-      .eq('status', 'active')
       .order('created_at', { ascending: false });
+
+    // Only filter by active status for public browse (no seller_id)
+    if (!sellerId) {
+      query = query.eq('status', 'active');
+    }
 
     if (sellerId) {
       query = query.eq('seller_id', sellerId);

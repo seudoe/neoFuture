@@ -56,7 +56,7 @@ export default function RootLayout({
       >
         <I18nProvider>
           {children}
-          <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
+          <Toaster position="top-center" toastOptions={{ duration: 5000 }} />
           <ChatbotButton />
           <PWAInstallPrompt />
         </I18nProvider>

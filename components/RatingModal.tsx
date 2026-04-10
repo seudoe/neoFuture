@@ -6,21 +6,17 @@ import { Star, X } from 'lucide-react';
 interface RatingModalProps {
   isOpen: boolean;
   onClose: () => void;
-  order: any;
-  currentUserId: number;
-  currentUserType: 'buyer' | 'seller';
-  onRatingSubmit: (rating: number, review: string) => void;
+  onSubmit: (rating: number, review: string) => void;
   existingRating?: any;
+  orderDetails: any;
 }
 
 export default function RatingModal({
   isOpen,
   onClose,
-  order,
-  currentUserId,
-  currentUserType,
-  onRatingSubmit,
-  existingRating
+  onSubmit,
+  existingRating,
+  orderDetails
 }: RatingModalProps) {
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
@@ -43,7 +39,7 @@ export default function RatingModal({
 
     setIsSubmitting(true);
     try {
-      await onRatingSubmit(rating, review);
+      await onSubmit(rating, review);
       onClose();
     } catch (error) {
       console.error('Error submitting rating:', error);
@@ -52,16 +48,17 @@ export default function RatingModal({
     }
   };
 
-  const targetUser = currentUserType === 'buyer' ? order.seller : order.buyer;
-  const targetUserType = currentUserType === 'buyer' ? 'seller' : 'buyer';
+  if (!isOpen || !orderDetails) return null;
 
-  if (!isOpen) return null;
+  const order = orderDetails;
+  // Determine target user based on what's available in the order
+  const targetUser = order.seller || order.buyer || {};
+  const targetUserType = order.seller ? 'seller' : 'buyer';
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
         <div className="p-6">
-          {/* Header */}
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-xl font-bold text-gray-900">
               {existingRating ? 'Update Rating' : `Rate ${targetUserType === 'seller' ? 'Farmer' : 'Buyer'}`}
@@ -74,7 +71,6 @@ export default function RatingModal({
             </button>
           </div>
 
-          {/* Order Info */}
           <div className="mb-6 p-4 bg-gray-50 rounded-xl">
             <div className="flex items-center space-x-3 mb-2">
               <div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center">
@@ -89,20 +85,19 @@ export default function RatingModal({
                 )}
               </div>
               <div>
-                <h3 className="font-semibold text-gray-900">{order.product?.name}</h3>
+                <h3 className="font-semibold text-gray-900">{order.product?.name || 'Product'}</h3>
                 <p className="text-sm text-gray-600">Order #{order.id}</p>
                 <p className="text-sm text-gray-600">{order.quantity}kg × ₹{order.unit_price}</p>
               </div>
             </div>
             <div className="text-sm text-gray-600">
-              <p><span className="font-medium">{targetUserType === 'seller' ? 'Farmer' : 'Buyer'}:</span> {targetUser?.name}</p>
-              <p><span className="font-medium">Date:</span> {new Date(order.order_date).toLocaleDateString()}</p>
-              <p><span className="font-medium">Status:</span> <span className="capitalize">{order.status}</span></p>
+              <p><span className="font-medium">{targetUserType === 'seller' ? 'Farmer' : 'Buyer'}:</span> {targetUser?.name || 'N/A'}</p>
+              <p><span className="font-medium">Date:</span> {order.order_date ? new Date(order.order_date).toLocaleDateString() : 'N/A'}</p>
+              <p><span className="font-medium">Status:</span> <span className="capitalize">{order.status || 'N/A'}</span></p>
             </div>
           </div>
 
           <form onSubmit={handleSubmit}>
-            {/* Rating Stars */}
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-3">
                 Rate your experience (1-5 stars)
@@ -138,7 +133,6 @@ export default function RatingModal({
               )}
             </div>
 
-            {/* Review Text */}
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Review (Optional)
@@ -156,7 +150,6 @@ export default function RatingModal({
               </div>
             </div>
 
-            {/* Action Buttons */}
             <div className="flex gap-3">
               <button
                 type="button"

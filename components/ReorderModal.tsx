@@ -7,10 +7,10 @@ interface ReorderModalProps {
   isOpen: boolean;
   onClose: () => void;
   order: any;
-  onConfirmReorder: (quantity: number) => void;
+  onConfirm: (quantity: number) => void;
 }
 
-export default function ReorderModal({ isOpen, onClose, order, onConfirmReorder }: ReorderModalProps) {
+export default function ReorderModal({ isOpen, onClose, order, onConfirm }: ReorderModalProps) {
   const [quantity, setQuantity] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -26,7 +26,7 @@ export default function ReorderModal({ isOpen, onClose, order, onConfirmReorder 
 
     setIsSubmitting(true);
     try {
-      await onConfirmReorder(quantity);
+      await onConfirm(quantity);
       onClose();
     } catch (error) {
       console.error('Error placing reorder:', error);

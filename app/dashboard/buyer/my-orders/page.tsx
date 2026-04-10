@@ -3,10 +3,11 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useI18n } from '@/lib/i18n/context';
-import { Package, Star, Phone, ImageIcon } from 'lucide-react';
+import { Package, Star, Phone, ImageIcon, QrCode } from 'lucide-react';
 import { useDashboardData, useOrders, useRatings } from '@/lib/hooks/useDashboardData';
 import RatingModal from '@/components/RatingModal';
 import ReorderModal from '@/components/ReorderModal';
+import OrderDetailsModal from '@/components/OrderDetailsModal';
 import toast from 'react-hot-toast';
 
 export default function MyOrdersPage() {
@@ -21,6 +22,8 @@ export default function MyOrdersPage() {
   const [orderRatings, setOrderRatings] = useState<{[key: number]: any}>({});
   const [showReorderModal, setShowReorderModal] = useState(false);
   const [selectedOrderForReorder, setSelectedOrderForReorder] = useState<any>(null);
+  const [showTrackingModal, setShowTrackingModal] = useState(false);
+  const [selectedOrderForTracking, setSelectedOrderForTracking] = useState<any>(null);
 
   // Fetch ratings for orders
   useState(() => {
@@ -226,6 +229,17 @@ export default function MyOrdersPage() {
 
                 <div className="flex gap-2 flex-wrap">
                   <button 
+                    onClick={() => {
+                      setSelectedOrderForTracking(order);
+                      setShowTrackingModal(true);
+                    }}
+                    className="px-4 py-2 bg-purple-600 text-white rounded-lg text-sm hover:bg-purple-700 transition-colors flex items-center space-x-1"
+                  >
+                    <QrCode className="w-4 h-4" />
+                    <span>View Tracking</span>
+                  </button>
+
+                  <button 
                     onClick={() => handleRateOrder(order)}
                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                       orderRatings[order.id] 
@@ -362,6 +376,17 @@ export default function MyOrdersPage() {
           onSubmit={handleRatingSubmit}
           existingRating={orderRatings[selectedOrderForRating.id]}
           orderDetails={selectedOrderForRating}
+        />
+      )}
+
+      {showTrackingModal && selectedOrderForTracking && (
+        <OrderDetailsModal
+          isOpen={showTrackingModal}
+          onClose={() => {
+            setShowTrackingModal(false);
+            setSelectedOrderForTracking(null);
+          }}
+          order={selectedOrderForTracking}
         />
       )}
 

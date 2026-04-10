@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useI18n } from '@/lib/i18n/context';
 import { 
   BarChart3, 
@@ -74,6 +75,7 @@ interface CartItem {
 
 export default function BuyerDashboard() {
   const { t } = useI18n();
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [user, setUser] = useState<User | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
@@ -97,16 +99,18 @@ export default function BuyerDashboard() {
   const [userLocation, setUserLocation] = useState<{latitude: number, longitude: number, address?: string, state?: string} | null>(null);
 
   useEffect(() => {
-    // Get user from localStorage
+    // Get user from localStorage (runs only client-side after mount)
     const userData = localStorage.getItem('user');
-    if (userData) {
-      const parsedUser = JSON.parse(userData);
-      setUser(parsedUser);
-      fetchCart(parsedUser.id);
-      fetchOrders(parsedUser.id);
-      fetchReceivedRatings(parsedUser.id);
-      fetchUserStats(parsedUser.id);
+    if (!userData) {
+      router.replace('/login');
+      return;
     }
+    const parsedUser = JSON.parse(userData);
+    setUser(parsedUser);
+    fetchCart(parsedUser.id);
+    fetchOrders(parsedUser.id);
+    fetchReceivedRatings(parsedUser.id);
+    fetchUserStats(parsedUser.id);
     fetchProducts();
     fetchSuppliers();
 
@@ -478,9 +482,9 @@ export default function BuyerDashboard() {
             <div className="flex items-center space-x-4">
               <LanguageSwitcher />
               <span className="text-sm text-gray-600">{t('farmer.welcome')}, {user?.name}</span>
-              <Link href="/" className="text-sm text-white hover:text-gray-700 px-4 py-1 bg-red-400 rounded-lg">
+              <button onClick={() => { localStorage.removeItem('user'); router.push('/'); }} className="text-sm text-white hover:text-gray-700 px-4 py-1 bg-red-400 rounded-lg">
                 Logout
-              </Link>
+              </button>
             </div>
           </div>
           
@@ -496,9 +500,9 @@ export default function BuyerDashboard() {
               </div>
               <div className="flex items-center space-x-2">
                 <LanguageSwitcher />
-                <Link href="/" className="text-sm text-white hover:text-gray-700  px-4 py-1 bg-red-400 rounded-lg">
+                <button onClick={() => { localStorage.removeItem('user'); router.push('/'); }} className="text-sm text-white hover:text-gray-700  px-4 py-1 bg-red-400 rounded-lg">
                   Logout
-                </Link>
+                </button>
               </div>
             </div>
             <div className="text-center">

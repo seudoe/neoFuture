@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import supabase from '@/lib/supabase';
+import pool from '@/lib/db';
 import bcrypt from 'bcryptjs';
 
 export async function POST(request: NextRequest) {
@@ -13,37 +13,47 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if identifier is email or phone
     const isEmail = identifier.includes('@');
-    
-    let query = supabase.from('users').select('*');
-    
-    if (isEmail) {
-      query = query.eq('email', identifier);
-    } else {
-      query = query.eq('phone_number', identifier);
-    }
-    
-    const { data: users, error } = await query.single();
-    
-    if (error || !users) {
-      return NextResponse.json(
-        { error: 'User not found' },
-        { status: 401 }
+    const field = isEmail ? 'email' : 'phone_number';
+
+    const client = await pool.connect();
+    let result;
+    try {
+      result = await client.query(
+        `SELECT * FROM users WHERE ${field} = $1 LIMIT 1`,
+        [identifier]
       );
+    } finally {
+      client.release();
     }
 
-    const isValidPassword = await bcrypt.compare(password, users.password);
+    const user = result.rows[0];
+
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 401 });
+    }
+
+    const storedPassword = user.password;
+    const isBcrypt = storedPassword?.startsWith('$2');
+
+    console.log('Login attempt:', {
+      identifier,
+      userFound: !!user,
+      storedPasswordPrefix: storedPassword?.substring(0, 7),
+      isBcrypt,
+      inputPassword: password
+    });
+
+    // Support both bcrypt hashed and plain text passwords
+    const isValidPassword = isBcrypt
+      ? await bcrypt.compare(password, storedPassword)
+      : password === storedPassword;
 
     if (!isValidPassword) {
-      return NextResponse.json(
-        { error: 'Invalid password' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Invalid password' }, { status: 401 });
     }
 
-    // Remove password from response
-    const { password: _, ...userWithoutPassword } = users;
+    const { password: _, ...userWithoutPassword } = user;
 
     return NextResponse.json({
       message: 'Login successful',
@@ -53,7 +63,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Login error:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Internal server error', details: error instanceof Error ? error.message : 'Unknown' },
       { status: 500 }
     );
   }

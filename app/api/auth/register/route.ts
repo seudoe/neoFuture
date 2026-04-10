@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import supabase from '@/lib/supabase';
+import pool from '@/lib/db';
 import bcrypt from 'bcryptjs';
 
 export async function POST(request: NextRequest) {
@@ -20,53 +20,44 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if user already exists
-    const { data: existingUser, error: checkError } = await supabase
-      .from('users')
-      .select('id')
-      .or(`email.eq.${email},phone_number.eq.${phone_number}`)
-      .single();
-
-    if (existingUser) {
-      return NextResponse.json(
-        { error: 'User with this email or phone number already exists' },
-        { status: 409 }
+    const client = await pool.connect();
+    try {
+      // Check if user already exists
+      const existing = await client.query(
+        'SELECT id FROM users WHERE email = $1 OR phone_number = $2 LIMIT 1',
+        [email, phone_number || null]
       );
-    }
 
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
+      if (existing.rows.length > 0) {
+        return NextResponse.json(
+          { error: 'User with this email or phone number already exists' },
+          { status: 409 }
+        );
+      }
 
-    // Insert new user
-    const { data: newUser, error } = await supabase
-      .from('users')
-      .insert({
-        name,
-        email,
-        phone_number,
-        password: hashedPassword,
-        role
-      })
-      .select('id, name, email, phone_number, role, created_at')
-      .single();
+      // Hash password
+      const hashedPassword = await bcrypt.hash(password, 10);
 
-    if (error) {
-      console.error('Registration error:', error);
-      return NextResponse.json(
-        { error: 'Registration failed' },
-        { status: 500 }
+      const result = await client.query(
+        `INSERT INTO users (name, email, phone_number, password, role)
+         VALUES ($1, $2, $3, $4, $5)
+         RETURNING id, name, email, phone_number, role, created_at`,
+        [name, email, phone_number || null, hashedPassword, role]
       );
-    }
 
-    return NextResponse.json({
-      message: 'User registered successfully',
-      user: newUser
-    }, { status: 201 });
+      return NextResponse.json({
+        message: 'User registered successfully',
+        user: result.rows[0]
+      }, { status: 201 });
+
+    } finally {
+      client.release();
+    }
 
   } catch (error) {
     console.error('Registration error:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Internal server error', details: error instanceof Error ? error.message : 'Unknown' },
       { status: 500 }
     );
   }

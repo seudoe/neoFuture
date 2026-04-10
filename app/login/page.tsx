@@ -24,6 +24,19 @@ export default function LoginPage() {
   const [weatherLoading, setWeatherLoading] = useState(true);
   const router = useRouter();
 
+  // Redirect if already logged in
+  useEffect(() => {
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      const parsedUser = JSON.parse(userData);
+      if (parsedUser.role === 'farmer') {
+        router.replace('/dashboard/farmer');
+      } else {
+        router.replace('/dashboard/buyer');
+      }
+    }
+  }, []);
+
   // Fetch weather data on component mount
   useEffect(() => {
     fetchWeather();
@@ -437,7 +450,7 @@ export default function LoginPage() {
                 </div>
 
                 {/* Demo Note - Styled */}
-                <div className="mt-6 pt-4 border-t border-gray-100 text-center">
+                <div className="mt-6 pt-4 border-t border-gray-100 text-center hidden">
                     <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wider mb-1">{t('auth.demoCredentials')}</p>
                     <div className="flex flex-col space-y-1 text-[10px] text-gray-500">
                         <span>{t('auth.farmer')}: <span className="font-mono bg-gray-100 px-1 rounded">rajesh.farmer@agribridge.com</span> / <span className="font-mono bg-gray-100 px-1 rounded">farmer123</span></span>

@@ -1,0 +1,183 @@
+// -----------------------------------------------------------------------------------
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+{
+    "workbench.activityBar.location": "default",
+    "workbench.colorTheme": "Monokai",
+    "files.autoSave": "onFocusChange",
+    "workbench.colorCustomizations": {
+        "editor.background":"#171717",
+        "editor.lineHighlightBackground":"#343434",
+
+        // indent lines
+        "editorIndentGuide.background1": "default",       // Color of regular indent guides
+        "editorIndentGuide.activeBackground1": "default",  // Color of active indent guide
+        // "editorGroup.border":"#2b6b93",
+
+
+        "terminal.background":"#000000",
+
+        "tab.inactiveBackground":"#636363",
+        "tab.inactiveForeground":"#ffffff",
+        // "tab."
+
+        "sideBar.border":"#2b6b93",
+        "sideBar.foreground":"#ffffff",
+
+        "statusBar.background":"#000000"
+    },
+    "terminal.integrated.fontSize": 17,
+    "explorer.sortOrder": "type",
+
+    "workbench.editor.scrollToSwitchTabs": false,
+    "workbench.editor.enablePreview": false,
+    "workbench.editor.enablePreviewFromQuickOpen": false,
+    
+    "editor.renderWhitespace": "boundary",
+    "editor.mouseWheelZoom": true,
+    "editor.minimap.showSlider": "always",
+    "editor.cursorWidth": 3,
+    "editor.linkedEditing": true,
+    "editor.inlineSuggest.enabled": false, 
+    
+    "vsicons.presets.hideFolders": true,
+
+    "debug.inlineValues": "off",
+    "java.debug.settings.onBuildFailureProceed": true,
+    "java.dependency.syncWithFolderExplorer": false,
+    "java.inlayHints.parameterNames.enabled": "none",   // disable x: and s: in java
+
+    "accessibility.hideAccessibleView": true,
+    "workbench.experimental.sidePanel.enabled": true,
+    "github.copilot.editor.enableAutoCompletions": false,
+    "github.copilot.ch": true,
+    //"github.copilot.enable": false,  // Disables Copilot suggestions
+    // "github.copilot.inlineSuggest.enable": false,  // Disables inline suggestions
+    // Deprecated: Please use github.copilot.editor.enableAutoCompletions instead.
+
+    "files.exclude":{
+        "**/*.obj": true,
+        "**/*.ilk": true,
+        "**/*.pdb": true,
+        "**/*.exe": false,
+        "**/*.class": false,
+    },
+    
+    "files.associations": {
+        "iostream": "cpp",
+        "cstdlib": "c"
+    },
+    
+    "[html]": {
+        "editor.tabSize": 2,
+        //"editor.insertSpaces": true
+    },
+    "[cpp]": {
+        "editor.tabSize": 4,
+        "editor.insertSpaces": true
+    },
+    "[c]": {
+        "editor.tabSize": 4,
+        "editor.insertSpaces": true
+    },
+    "[python]": {
+        "editor.tabSize": 4,
+        "editor.insertSpaces": true
+    },
+    "[javascript]": {
+        "editor.tabSize": 4,
+        // "editor.insertSpaces": true
+    },
+    "[javascriptreact]":{
+        "editor.tabSize": 2,
+        "editor.insertSpaces": true
+    },
+
+    "code-runner.executorMap": {
+        "javascript": "node",
+        "java": "cd $dir && javac $fileName && java $fileNameWithoutExt",
+        "c": "cd $dir && gcc $fileName -o $fileNameWithoutExt && $dir$fileNameWithoutExt",
+        "zig": "zig run",
+        "cpp": "cd $dir && g++ $fileName -o $fileNameWithoutExt && $dir$fileNameWithoutExt",
+        "objective-c": "cd $dir && gcc -framework Cocoa $fileName -o $fileNameWithoutExt && $dir$fileNameWithoutExt",
+        "php": "php",
+        "python": "python -u",
+        "perl": "perl",
+        "perl6": "perl6",
+        "ruby": "ruby",
+        "go": "go run",
+        "lua": "lua",
+        "groovy": "groovy",
+        "powershell": "powershell -ExecutionPolicy ByPass -File",
+        "bat": "cmd /c",
+        "shellscript": "bash",
+        "fsharp": "fsi",
+        "csharp": "scriptcs",
+        "vbscript": "cscript //Nologo",
+        "typescript": "ts-node",
+        "coffeescript": "coffee",
+        "scala": "scala",
+        "swift": "swift",
+        "julia": "julia",
+        "crystal": "crystal",
+        "ocaml": "ocaml",
+        "r": "Rscript",
+        "applescript": "osascript",
+        "clojure": "lein exec",
+        "haxe": "haxe --cwd $dirWithoutTrailingSlash --run $fileNameWithoutExt",
+        "rust": "cd $dir && rustc $fileName && $dir$fileNameWithoutExt",
+        "racket": "racket",
+        "scheme": "csi -script",
+        "ahk": "autohotkey",
+        "autoit": "autoit3",
+        "dart": "dart",
+        "pascal": "cd $dir && fpc $fileName && $dir$fileNameWithoutExt",
+        "d": "cd $dir && dmd $fileName && $dir$fileNameWithoutExt",
+        "haskell": "runghc",
+        "nim": "nim compile --verbosity:0 --hints:off --run",
+        "lisp": "sbcl --script",
+        "kit": "kitc --run",
+        "v": "v run",
+        "sass": "sass --style expanded",
+        "scss": "scss --style expanded",
+        "less": "cd $dir && lessc $fileName $fileNameWithoutExt.css",
+        "FortranFreeForm": "cd $dir && gfortran $fileName -o $fileNameWithoutExt && $dir$fileNameWithoutExt",
+        "fortran-modern": "cd $dir && gfortran $fileName -o $fileNameWithoutExt && $dir$fileNameWithoutExt",
+        "fortran_fixed-form": "cd $dir && gfortran $fileName -o $fileNameWithoutExt && $dir$fileNameWithoutExt",
+        "fortran": "cd $dir && gfortran $fileName -o $fileNameWithoutExt && $dir$fileNameWithoutExt",
+        "sml": "cd $dir && sml $fileName",
+        "mojo": "mojo run",
+        "erlang": "escript",
+        "spwn": "spwn build",
+        "pkl": "cd $dir && pkl eval -f yaml $fileName -o $fileNameWithoutExt.yaml",
+        "gleam": "gleam run -m $fileNameWithoutExt"
+    },
+    
+    "indentRainbow.colors": [
+
+        "rgba(255, 0 , 0, 0.1)",
+        "rgba(255, 127, 0, 0.1)",
+        "rgba(255, 255, 0, 0.1)",
+        "rgba(0, 255, 0, 0.1)",
+        "rgba(0, 0, 255, 0.1)",
+        "rgba(75, 0, 130, 0.1)",
+        "rgba(148, 0, 211, 0.1)",
+    
+        // "rgba(134, 0, 0, 0.603)",
+        // "rgba(255,255,64,0.07)",
+        // "rgba(127,255,127,0.1)",
+        // "rgba(255,127,255,0.07)",
+        // "rgba(79,236,236,0.07)"
+    ],
+    "indentRainbow.indicatorStyle": "classic",
+    "postman.settings.dotenv-detection-notification-visibility": false,
+}
+/*
+"rgba(148, 0, 211, 0.5)",
+"rgba(75, 0, 130, 0.5)",
+"rgba(0, 0, 255, 0.5)",
+"rgba(0, 255, 0, 0.5)",
+"rgba(255, 255, 0, 0.5)",
+"rgba(255, 127, 0, 0.5)",
+"rgba(255, 0 , 0, 0.5)",
+*/

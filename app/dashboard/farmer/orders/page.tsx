@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { useI18n } from '@/lib/i18n/context';
-import { Package, Star, Phone, ImageIcon } from 'lucide-react';
+import { Package, Star, Phone, ImageIcon, QrCode } from 'lucide-react';
 import { useDashboardData, useOrders, useRatings } from '@/lib/hooks/useDashboardData';
 import RatingModal from '@/components/RatingModal';
+import OrderDetailsModal from '@/components/OrderDetailsModal';
 import toast from 'react-hot-toast';
 
 export default function FarmerOrdersPage() {
@@ -16,6 +17,8 @@ export default function FarmerOrdersPage() {
   const [showRatingModal, setShowRatingModal] = useState(false);
   const [selectedOrderForRating, setSelectedOrderForRating] = useState<any>(null);
   const [orderRatings, setOrderRatings] = useState<{[key: number]: any}>({});
+  const [showTrackingModal, setShowTrackingModal] = useState(false);
+  const [selectedOrderForTracking, setSelectedOrderForTracking] = useState<any>(null);
 
   useEffect(() => {
     const fetchOrderRatings = async () => {
@@ -207,6 +210,17 @@ export default function FarmerOrdersPage() {
                   )}
                   
                   <button 
+                    onClick={() => {
+                      setSelectedOrderForTracking(order);
+                      setShowTrackingModal(true);
+                    }}
+                    className="px-4 py-2 bg-purple-600 text-white rounded-lg text-sm hover:bg-purple-700 transition-colors flex items-center space-x-1"
+                  >
+                    <QrCode className="w-4 h-4" />
+                    <span>View Tracking</span>
+                  </button>
+
+                  <button 
                     onClick={() => handleRateBuyer(order)}
                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                       orderRatings[order.id] 
@@ -304,6 +318,17 @@ export default function FarmerOrdersPage() {
           onSubmit={handleRatingSubmit}
           existingRating={orderRatings[selectedOrderForRating.id]}
           orderDetails={selectedOrderForRating}
+        />
+      )}
+
+      {showTrackingModal && selectedOrderForTracking && (
+        <OrderDetailsModal
+          isOpen={showTrackingModal}
+          onClose={() => {
+            setShowTrackingModal(false);
+            setSelectedOrderForTracking(null);
+          }}
+          order={selectedOrderForTracking}
         />
       )}
     </>

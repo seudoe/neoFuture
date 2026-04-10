@@ -12,7 +12,8 @@ import {
   Star,
   Award,
   ClipboardList,
-  Sprout
+  Sprout,
+  Briefcase
 } from 'lucide-react';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { useDashboardData, useProducts, useRatings } from '@/lib/hooks/useDashboardData';
@@ -47,6 +48,7 @@ export default function FarmerLayout({ children }: { children: React.ReactNode }
     { id: 'orders', name: t('navigation.myOrders'), icon: Package, path: '/dashboard/farmer/orders' },
     { id: 'reviews', name: t('farmer.receivedReviews'), icon: Star, path: '/dashboard/farmer/reviews' },
     { id: 'subsidies', name: t('subsidies.title'), icon: Award, path: '/dashboard/farmer/subsidies' },
+    { id: 'jobs', name: 'Farm Jobs', icon: Briefcase, path: '/dashboard/farmer/jobs' },
     { id: 'profile', name: t('navigation.profile'), icon: User, path: '/dashboard/farmer/profile' },
   ];
 

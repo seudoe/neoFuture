@@ -6,6 +6,7 @@ import { Package, Star, Phone, ImageIcon, QrCode } from 'lucide-react';
 import { useDashboardData, useOrders, useRatings } from '@/lib/hooks/useDashboardData';
 import RatingModal from '@/components/RatingModal';
 import OrderDetailsModal from '@/components/OrderDetailsModal';
+import ReceiptButton from '@/components/ReceiptButton';
 import toast from 'react-hot-toast';
 
 export default function FarmerOrdersPage() {
@@ -219,6 +220,13 @@ export default function FarmerOrdersPage() {
                     <QrCode className="w-4 h-4" />
                     <span>View Tracking</span>
                   </button>
+
+                  <ReceiptButton
+                    orderId={order.id}
+                    receiptUrl={order.receipt_url}
+                    receiptGenerated={order.receipt_generated}
+                    orderStatus={order.status}
+                  />
 
                   <button 
                     onClick={() => handleRateBuyer(order)}

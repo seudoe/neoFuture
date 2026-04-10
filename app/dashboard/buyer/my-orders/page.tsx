@@ -8,6 +8,7 @@ import { useDashboardData, useOrders, useRatings } from '@/lib/hooks/useDashboar
 import RatingModal from '@/components/RatingModal';
 import ReorderModal from '@/components/ReorderModal';
 import OrderDetailsModal from '@/components/OrderDetailsModal';
+import ReceiptButton from '@/components/ReceiptButton';
 import toast from 'react-hot-toast';
 
 export default function MyOrdersPage() {
@@ -238,6 +239,13 @@ export default function MyOrdersPage() {
                     <QrCode className="w-4 h-4" />
                     <span>View Tracking</span>
                   </button>
+
+                  <ReceiptButton
+                    orderId={order.id}
+                    receiptUrl={order.receipt_url}
+                    receiptGenerated={order.receipt_generated}
+                    orderStatus={order.status}
+                  />
 
                   <button 
                     onClick={() => handleRateOrder(order)}

@@ -1,15 +1,104 @@
 'use client';
 
 import { useI18n } from '@/lib/i18n/context';
-import { User } from 'lucide-react';
+import { User, Save, X } from 'lucide-react';
 import { useDashboardData, useRatings } from '@/lib/hooks/useDashboardData';
 import UserRatingDisplay from '@/components/UserRatingDisplay';
 import RatingDisplay from '@/components/RatingDisplay';
+import { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
 
 export default function BuyerProfilePage() {
   const { t } = useI18n();
   const { user } = useDashboardData('buyer');
   const { receivedRatings, userStats, loading: statsLoading } = useRatings(user?.id, 'buyer');
+  const [isEditing, setIsEditing] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone_number: ''
+  });
+  const [saving, setSaving] = useState(false);
+
+  // Initialize form data when user loads
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        name: user.name || '',
+        email: user.email || '',
+        phone_number: user.phone_number || ''
+      });
+    }
+  }, [user]);
+
+  const handleEdit = () => {
+    setFormData({
+      name: user?.name || '',
+      email: user?.email || '',
+      phone_number: user?.phone_number || ''
+    });
+    setIsEditing(true);
+  };
+
+  const handleCancel = () => {
+    setIsEditing(false);
+    setFormData({
+      name: user?.name || '',
+      email: user?.email || '',
+      phone_number: user?.phone_number || ''
+    });
+  };
+
+  const handleSave = async () => {
+    if (!user) return;
+
+    // Validation
+    if (!formData.name.trim()) {
+      toast.error('Name is required');
+      return;
+    }
+    if (!formData.email.trim()) {
+      toast.error('Email is required');
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      toast.error('Please enter a valid email');
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const response = await fetch('/api/users', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: user.id,
+          ...formData
+        })
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        // Update localStorage
+        const updatedUser = { ...user, ...formData };
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+        
+        toast.success('Profile updated successfully!');
+        setIsEditing(false);
+        
+        // Reload page to reflect changes
+        window.location.reload();
+      } else {
+        toast.error(result.error || 'Failed to update profile');
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      toast.error('Error updating profile');
+    } finally {
+      setSaving(false);
+    }
+  };
 
   if (!user) return null;
 
@@ -33,9 +122,19 @@ export default function BuyerProfilePage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">{t('forms.fullName')}</label>
-              <div className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900">
-                {user.name}
-              </div>
+              {isEditing ? (
+                <input
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  className="w-full px-4 py-3 border border-blue-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter your name"
+                />
+              ) : (
+                <div className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900">
+                  {user.name}
+                </div>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">{t('forms.role')}</label>
@@ -45,22 +144,66 @@ export default function BuyerProfilePage() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">{t('forms.emailAddress')}</label>
-              <div className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900">
-                {user.email}
-              </div>
+              {isEditing ? (
+                <input
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  className="w-full px-4 py-3 border border-blue-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter your email"
+                />
+              ) : (
+                <div className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900">
+                  {user.email}
+                </div>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">{t('forms.phoneNumber')}</label>
-              <div className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900">
-                {user.phone_number || t('forms.notProvided')}
-              </div>
+              {isEditing ? (
+                <input
+                  type="tel"
+                  value={formData.phone_number}
+                  onChange={(e) => setFormData({ ...formData, phone_number: e.target.value })}
+                  className="w-full px-4 py-3 border border-blue-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter your phone number"
+                />
+              ) : (
+                <div className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900">
+                  {user.phone_number || t('forms.notProvided')}
+                </div>
+              )}
             </div>
           </div>
           
-          <div className="mt-8">
-            <button className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors">
-              {t('forms.editProfile')}
-            </button>
+          <div className="mt-8 flex gap-3">
+            {isEditing ? (
+              <>
+                <button
+                  onClick={handleSave}
+                  disabled={saving}
+                  className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <Save className="w-4 h-4" />
+                  {saving ? 'Saving...' : 'Save Changes'}
+                </button>
+                <button
+                  onClick={handleCancel}
+                  disabled={saving}
+                  className="px-6 py-3 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <X className="w-4 h-4" />
+                  Cancel
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={handleEdit}
+                className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors"
+              >
+                {t('forms.editProfile')}
+              </button>
+            )}
           </div>
         </div>
       </div>

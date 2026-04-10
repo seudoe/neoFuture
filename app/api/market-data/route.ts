@@ -1,16 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 interface RawMarketRecord {
-  State: string;
-  District: string;
-  Market: string;
-  Commodity: string;
-  Variety: string;
-  Grade: string;
-  Arrival_Date: string;
-  Min_Price: string;
-  Max_Price: string;
-  Modal_Price: string;
+  // New API (lowercase)
+  state?: string;
+  district?: string;
+  market?: string;
+  commodity?: string;
+  variety?: string;
+  grade?: string;
+  arrival_date?: string;
+  min_price?: number | string;
+  max_price?: number | string;
+  modal_price?: number | string;
+  // Old API (capitalized)
+  State?: string;
+  District?: string;
+  Market?: string;
+  Commodity?: string;
+  Variety?: string;
+  Grade?: string;
+  Arrival_Date?: string;
+  Min_Price?: string;
+  Max_Price?: string;
+  Modal_Price?: string;
 }
 
 interface MarketRecord {
@@ -59,25 +71,26 @@ function parseArrivalDate(dateStr: string): Date {
  */
 function normalizeRecord(rawRecord: RawMarketRecord): MarketRecord {
   try {
-    const minPrice = Number(rawRecord.Min_Price);
-    const maxPrice = Number(rawRecord.Max_Price);
-    const modalPrice = Number(rawRecord.Modal_Price);
+    // Support both new lowercase and old capitalized field names
+    const minPrice = Number(rawRecord.min_price ?? rawRecord.Min_Price);
+    const maxPrice = Number(rawRecord.max_price ?? rawRecord.Max_Price);
+    const modalPrice = Number(rawRecord.modal_price ?? rawRecord.Modal_Price);
+    const arrivalDate = (rawRecord.arrival_date ?? rawRecord.Arrival_Date) as string;
 
-    // Validate prices are positive numbers
     if (isNaN(minPrice) || isNaN(maxPrice) || isNaN(modalPrice) ||
         minPrice < 0 || maxPrice < 0 || modalPrice < 0) {
       throw new Error('Invalid price data');
     }
 
     return {
-      state: rawRecord.State,
-      district: rawRecord.District,
-      market: rawRecord.Market,
-      commodity: rawRecord.Commodity,
-      variety: rawRecord.Variety,
-      grade: rawRecord.Grade,
-      arrivalDate: rawRecord.Arrival_Date,
-      arrivalDateObj: parseArrivalDate(rawRecord.Arrival_Date),
+      state: (rawRecord.state ?? rawRecord.State) as string,
+      district: (rawRecord.district ?? rawRecord.District) as string,
+      market: (rawRecord.market ?? rawRecord.Market) as string,
+      commodity: (rawRecord.commodity ?? rawRecord.Commodity) as string,
+      variety: (rawRecord.variety ?? rawRecord.Variety) as string,
+      grade: (rawRecord.grade ?? rawRecord.Grade) as string,
+      arrivalDate,
+      arrivalDateObj: parseArrivalDate(arrivalDate),
       minPrice,
       maxPrice,
       modalPrice
@@ -149,8 +162,8 @@ export async function GET(request: NextRequest) {
       'onions': ['Onion'],
       'potato': ['Potato'],
       'potatoes': ['Potato'],
-      'rice': ['Rice'],
-      'wheat': ['Wheat'],
+      'rice': ['Rice', 'Paddy', 'Paddy(Dhan)(Common)', 'Paddy(Dhan)(Hybrid)'],
+      'wheat': ['Wheat', 'Wheat(Dara)'],
       'beans': ['Beans'],
       'bean': ['Beans'],
       'brinjal': ['Brinjal'],
@@ -239,12 +252,12 @@ export async function GET(request: NextRequest) {
       const params = new URLSearchParams({
         'api-key': apiKey,
         format: 'json',
-        'filters[Commodity]': commodity,
+        'filters[commodity]': commodity,
         limit: '20'
       });
 
       if (state) {
-        params.append('filters[State]', state);
+        params.append('filters[state]', state);
       }
 
       const url = `${apiUrl}?${params.toString()}`;

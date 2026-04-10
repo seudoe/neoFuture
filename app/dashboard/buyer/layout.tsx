@@ -23,7 +23,6 @@ export default function BuyerLayout({ children }: { children: React.ReactNode })
   const { user, loading } = useDashboardData('buyer');
   const { products } = useProducts();
   const { userStats } = useRatings(user?.id, 'buyer');
-  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     if (!loading && !user) {
@@ -187,26 +186,6 @@ export default function BuyerLayout({ children }: { children: React.ReactNode })
                     </div>
                   </div>
                 )}
-              </div>
-            </div>
-
-            {/* Search Widget */}
-            <div className="mt-6 bg-white rounded-2xl shadow-sm p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('common.search')} {t('dashboard.products')}</h3>
-              <div className="space-y-3">
-                <input
-                  type="text"
-                  placeholder={t('placeholders.searchProducts')}
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 placeholder-gray-500"
-                />
-                <button 
-                  onClick={() => router.push('/dashboard/buyer/browse')}
-                  className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  {t('common.search')}
-                </button>
               </div>
             </div>
           </div>

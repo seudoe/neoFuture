@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useI18n } from '@/lib/i18n/context';
-import { Wheat, Plus, ImageIcon } from 'lucide-react';
+import { Wheat, Plus, ImageIcon, Search, X } from 'lucide-react';
 import { useDashboardData, useProducts } from '@/lib/hooks/useDashboardData';
 import EditProduct from '@/components/EditProduct';
 import ProductDetails from '@/components/ProductDetails';
@@ -18,6 +18,13 @@ export default function MyCropsPage() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [viewingProduct, setViewingProduct] = useState<any>(null);
   const [showProductDetails, setShowProductDetails] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const filteredProducts = products.filter(p =>
+    p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    p.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (p.location || '').toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const handleEditProduct = (product: any) => {
     setEditingProduct(product);
@@ -46,42 +53,68 @@ export default function MyCropsPage() {
   return (
     <>
       <div className="bg-white rounded-2xl shadow-sm p-4 lg:p-8">
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
           <div className="flex items-center">
-            <Wheat className="w-6 h-6 text-green-600 mr-3" />
+            <Wheat className="w-6 h-6 text-green-600 mr-3 shrink-0" />
             <div>
               <h2 className="text-2xl font-bold text-gray-900">My Crops</h2>
-              <p className="text-sm text-gray-600 mt-1">Click on any product to see how buyers view it</p>
+              <p className="text-sm text-gray-600 mt-0.5">Click on any product to see how buyers view it</p>
             </div>
           </div>
-          <button
-            onClick={() => router.push('/dashboard/farmer/add-product')}
-            className="flex items-center px-4 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            {t('farmer.addProduct')}
-          </button>
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search crops..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-9 pr-8 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none text-gray-900 placeholder-gray-500 text-sm w-44"
+              />
+              {searchTerm && (
+                <button onClick={() => setSearchTerm('')} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+            <button
+              onClick={() => router.push('/dashboard/farmer/add-product')}
+              className="flex items-center px-4 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors shrink-0"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              {t('farmer.addProduct')}
+            </button>
+          </div>
         </div>
 
         {loading ? (
           <div className="text-center py-8">
             <div className="text-gray-500">{t('messages.loadingProducts')}</div>
           </div>
-        ) : products.length === 0 ? (
+        ) : filteredProducts.length === 0 ? (
           <div className="text-center py-12">
             <Wheat className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">{t('status.noProductsYet')}</h3>
-            <p className="text-gray-500 mb-4">{t('status.startByAdding')}</p>
-            <button
-              onClick={() => router.push('/dashboard/farmer/add-product')}
-              className="px-6 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors"
-            >
-              {t('status.addYourFirstProduct')}
-            </button>
+            {searchTerm ? (
+              <>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">No crops match "{searchTerm}"</h3>
+                <button onClick={() => setSearchTerm('')} className="text-green-600 text-sm hover:underline">Clear search</button>
+              </>
+            ) : (
+              <>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">{t('status.noProductsYet')}</h3>
+                <p className="text-gray-500 mb-4">{t('status.startByAdding')}</p>
+                <button
+                  onClick={() => router.push('/dashboard/farmer/add-product')}
+                  className="px-6 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors"
+                >
+                  {t('status.addYourFirstProduct')}
+                </button>
+              </>
+            )}
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {products.map((product) => (
+            {filteredProducts.map((product) => (
               <div key={product.id} className="border border-gray-200 rounded-xl p-4 hover:shadow-md transition-shadow cursor-pointer">
                 <div 
                   className="w-full h-32 bg-gray-100 rounded-lg mb-4 flex items-center justify-center relative"

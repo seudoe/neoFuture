@@ -5,68 +5,72 @@ interface ChatMessage {
   content: string;
 }
 
-// System prompt to restrict to agriculture only
-const SYSTEM_PROMPT = `You are an expert agricultural advisor chatbot for Indian farmers. Your role is to provide accurate, practical farming advice.
+const SYSTEM_PROMPT = `Role: You are "Krishi Guru," a dedicated agricultural expert specializing in Indian farming. Your purpose is to provide technical, botanical, and practical guidance to farmers across India.
 
-STRICT RULES:
-1. ONLY answer questions related to agriculture, farming, crops, livestock, soil, weather impact on farming, pest control, irrigation, fertilizers, seeds, harvesting, agricultural markets, and farm equipment.
-2. If asked about ANYTHING else (politics, sports, entertainment, general knowledge, personal questions, math problems, coding, etc.), respond EXACTLY with: "I apologize, but I can only assist with agriculture and farming-related questions. Please ask me about crops, livestock, soil management, pest control, irrigation, or other farming topics."
-3. Keep answers practical and relevant to Indian farming context
-4. Use simple language that farmers can understand
-5. Provide actionable advice
+1. Defining "Agriculture":
+Answer any questions regarding:
+- Crop Botany: Identifying and describing plants/fruits/vegetables (e.g., "What is a lemon?", "Tell me about Mango").
+- Cultivation: Sowing, harvesting, soil health, and fertilizers (NPK).
+- Protection: Pest control, fungicides, and pesticides.
+- Livestock & Support: Cattle, poultry, PM-Kisan, and Mandi trade.
 
-Current conversation context: You are helping farmers make better decisions about their crops and farming practices.`;
+2. The Out-of-Bounds Protocol:
+If the question is entirely unrelated to agriculture (e.g., coding, sports, movies), respond EXACTLY with:
+"I apologize, but I can only assist with agriculture and farming-related questions. Please ask me about crops, livestock, soil management, pest control, irrigation, or other farming topics."
 
-// Check if question is agriculture-related (backup validation)
+3. Botanical Intent Rule:
+If asked about a specific plant or fruit, explain what it is and briefly mention its farming relevance in India (e.g., soil type or top-producing states).`;
+
+// ENHANCED KEYWORD LIST
 function isAgricultureRelated(question: string): boolean {
-  const agriKeywords = [
-    'crop', 'farm', 'soil', 'seed', 'plant', 'harvest', 'wheat', 'rice', 'tomato',
-    'pest', 'fertilizer', 'irrigation', 'cattle', 'livestock', 'vegetable', 'fruit',
-    'tractor', 'land', 'agriculture', 'farming', 'yield', 'disease', 'insect',
-    'weather', 'rain', 'drought', 'water', 'organic', 'chemical', 'mandi', 'market',
-    'potato', 'onion', 'corn', 'cotton', 'sugarcane', 'milk', 'poultry', 'chicken',
-    'goat', 'sheep', 'fish', 'aquaculture', 'horticulture', 'nursery', 'greenhouse'
-  ];
-  
   const lowerQuestion = question.toLowerCase();
-  return agriKeywords.some(keyword => lowerQuestion.includes(keyword));
+  
+  // 1. Broad categories
+  const categories = ['crop', 'farm', 'soil', 'seed', 'pest', 'fertilizer', 'irrigation', 'livestock', 'mandi', 'kisan', 'agriculture'];
+  
+  // 2. Common Indian Crops & Fruits (Added lemon, mango, etc.)
+  const plants = [
+    'lemon', 'nimbu', 'mango', 'rice', 'wheat', 'paddy', 'tomato', 'potato', 'onion', 
+    'chilli', 'cotton', 'sugarcane', 'dal', 'pulse', 'mustard', 'maize', 'corn', 
+    'banana', 'guava', 'citrus', 'ginger', 'garlic', 'turmeric'
+  ];
+
+  // 3. Livestock
+  const animals = ['cow', 'buffalo', 'poultry', 'chicken', 'goat', 'sheep', 'dairy', 'milk'];
+
+  const allKeywords = [...categories, ...plants, ...animals];
+  
+  // If the question is very short (like "What is a lemon?"), 
+  // we check if ANY word in the question is a keyword.
+  const words = lowerQuestion.split(/\W+/);
+  return words.some(word => allKeywords.includes(word)) || allKeywords.some(kw => lowerQuestion.includes(kw));
 }
 
 export async function POST(request: NextRequest) {
   try {
     const { message, conversationHistory = [] } = await request.json();
 
-    if (!message || typeof message !== 'string') {
-      return NextResponse.json(
-        { error: 'Message is required' },
-        { status: 400 }
-      );
-    }
+    if (!message) return NextResponse.json({ error: 'Message required' }, { status: 400 });
 
-    // Get API key from environment
     const apiKey = process.env.GROQ_API_KEY;
-    if (!apiKey) {
-      console.error('GROQ_API_KEY not configured');
-      return NextResponse.json({
-        response: 'I apologize, but the chatbot service is currently not configured. Please contact the administrator to set up the GROQ_API_KEY.'
-      });
-    }
 
-    // Optional: Pre-filter non-agriculture questions (extra safety)
-    if (!isAgricultureRelated(message) && message.length > 10) {
+    // REVISED VALIDATION LOGIC
+    // We only block it if it's long AND doesn't have keywords. 
+    // This allows short questions like "What is a lemon?" to pass through to the AI.
+    const hasAgriKeywords = isAgricultureRelated(message);
+    
+    if (!hasAgriKeywords && message.split(' ').length > 3) {
       return NextResponse.json({
         response: "I apologize, but I can only assist with agriculture and farming-related questions. Please ask me about crops, livestock, soil management, pest control, irrigation, or other farming topics."
       });
     }
 
-    // Build messages array
     const messages: ChatMessage[] = [
       { role: 'system', content: SYSTEM_PROMPT },
       ...conversationHistory,
       { role: 'user', content: message }
     ];
 
-    // Call Groq API
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -76,44 +80,17 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify({
         messages: messages,
         model: 'llama-3.3-70b-versatile',
-        temperature: 0.7,
+        temperature: 0.5, // Lower temperature makes it follow instructions more strictly
         max_tokens: 1024,
-        top_p: 0.9,
-        stream: false
       })
     });
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      console.error('Groq API error:', response.status, errorData);
-      
-      if (response.status === 429) {
-        return NextResponse.json({
-          response: 'Rate limit exceeded. Please wait a moment and try again.'
-        });
-      }
-      
-      if (response.status === 401) {
-        return NextResponse.json({
-          response: 'API key error. Please check your GROQ_API_KEY configuration.'
-        });
-      }
-      
-      return NextResponse.json({
-        response: 'Sorry, something went wrong. Please try again.'
-      });
-    }
-
     const data = await response.json();
-    const botResponse = data.choices?.[0]?.message?.content || 'Sorry, I could not generate a response.';
+    const botResponse = data.choices?.[0]?.message?.content;
 
     return NextResponse.json({ response: botResponse });
 
   } catch (error) {
-    console.error('Chatbot API error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

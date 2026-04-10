@@ -543,5 +543,40 @@
     "more": "more",
     "averagePrice": "Average Price:",
     "phoneNotAvailable": "Phone number not available"
+  },
+  "skillDevelopment": {
+    "title": "Skill Development",
+    "subtitle": "Learn new skills and grow your farming knowledge",
+    "videos": {
+      "title": "Skill-Based Videos",
+      "subtitle": "Learn from expert farmers and agricultural specialists",
+      "searchPlaceholder": "Search for skills (e.g., drip irrigation, organic farming)",
+      "search": "Search Videos",
+      "noVideos": "No videos found",
+      "tryDifferentSearch": "Try a different search term",
+      "watchVideo": "Watch Video",
+      "channel": "Channel",
+      "voiceSearch": "Voice Search"
+    },
+    "schemes": {
+      "title": "Government Skill Development Schemes",
+      "subtitle": "Enroll in government-sponsored training programs",
+      "eligibility": "Eligibility",
+      "learnMore": "Learn More",
+      "register": "Register / Learn More",
+      "noSchemes": "No schemes available",
+      "loading": "Loading schemes..."
+    },
+    "trainingCenters": {
+      "title": "Nearby Training Centers",
+      "subtitle": "Find training centers near you",
+      "kvk": "KVK",
+      "rseti": "RSETI",
+      "viewRegister": "View / Register",
+      "getDirections": "Get Directions",
+      "noCenters": "No training centers found",
+      "location": "Location",
+      "type": "Type"
+    }
   }
 }

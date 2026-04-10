@@ -45,12 +45,12 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
   const t = (key: string): string => {
     const keys = key.split('.');
     let value: any = messages[locale];
-    
-    for (const k of keys) {
-      value = value?.[k];
-    }
-    
-    return value || key;
+    for (const k of keys) value = value?.[k];
+    if (value && typeof value === 'string') return value;
+    // Fallback to English
+    let fallback: any = messages['en'];
+    for (const k of keys) fallback = fallback?.[k];
+    return (fallback && typeof fallback === 'string') ? fallback : key;
   };
 
   return (

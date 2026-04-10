@@ -1,0 +1,75 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Input styling for better readability */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="tel"],
+input[type="url"],
+input[type="search"],
+select,
+textarea {
+  color: #1f2937 !important; /* Dark gray text */
+}
+
+input[type="text"]::placeholder,
+input[type="email"]::placeholder,
+input[type="password"]::placeholder,
+input[type="number"]::placeholder,
+input[type="tel"]::placeholder,
+input[type="url"]::placeholder,
+input[type="search"]::placeholder,
+textarea::placeholder {
+  color: #6b7280 !important; /* Medium gray for placeholders */
+}
+
+/* Disabled input styling */
+input:disabled,
+select:disabled,
+textarea:disabled {
+  color: #9ca3af !important; /* Lighter gray for disabled state */
+  background-color: #f9fafb !important;
+}
+
+/* Select option styling */
+select option {
+  color: #1f2937 !important;
+  background-color: #ffffff !important;
+}
+
+select option:first-child {
+  color: #6b7280 !important; /* Placeholder option */
+}
+
+/* Focus states for better accessibility */
+input:focus,
+select:focus,
+textarea:focus {
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+}

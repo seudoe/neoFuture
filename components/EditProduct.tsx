@@ -11,7 +11,7 @@ interface Product {
   category: string;
   quantity: number;
   price_single: number;
-  price_multiple: number;
+  price_multiple: number | null;
   location: string;
   description: string;
   status: string;
@@ -42,7 +42,7 @@ export default function EditProduct({
     category: product.category,
     quantity: product.quantity,
     price_single: product.price_single,
-    price_multiple: product.price_multiple,
+    price_multiple: product.price_multiple ?? '',
     location: product.location,
     description: product.description,
     status: product.status
@@ -59,7 +59,7 @@ export default function EditProduct({
         category: product.category,
         quantity: product.quantity,
         price_single: product.price_single,
-        price_multiple: product.price_multiple,
+        price_multiple: product.price_multiple ?? '',
         location: product.location,
         description: product.description,
         status: product.status
@@ -91,7 +91,7 @@ export default function EditProduct({
 
       // Delete from Supabase Storage
       const { error } = await supabaseClient.storage
-        .from('Products')
+        .from('products')
         .remove([filePath]);
 
       if (error) {
@@ -173,7 +173,7 @@ export default function EditProduct({
         });
 
         const { error: storageError } = await supabaseClient.storage
-          .from('Products')
+          .from('products')
           .remove(filePaths);
 
         if (storageError) {

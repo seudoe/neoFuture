@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
 
     // Upload to Supabase Storage using service role (bypasses RLS)
     const { data, error } = await supabase.storage
-      .from('Products')
+      .from('products')
       .upload(filePath, buffer, {
         contentType: file.type,
         upsert: false
@@ -35,15 +35,28 @@ export async function POST(request: NextRequest) {
     if (error) {
       console.error('Upload error:', error);
       return NextResponse.json(
-        { error: 'Failed to upload file' },
+        { error: `Failed to upload file: ${error.message}` },
         { status: 500 }
       );
     }
 
     // Get public URL
     const { data: { publicUrl } } = supabase.storage
-      .from('Products')
+      .from('products')
       .getPublicUrl(filePath);
+
+    // Append URL to product's photos array in DB
+    const { data: product } = await supabase
+      .from('products')
+      .select('photos')
+      .eq('id', parseInt(productId))
+      .single();
+
+    const existingPhotos: string[] = product?.photos || [];
+    await supabase
+      .from('products')
+      .update({ photos: [...existingPhotos, publicUrl] })
+      .eq('id', parseInt(productId));
 
     return NextResponse.json({
       success: true,

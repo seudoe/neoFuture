@@ -52,12 +52,14 @@ export default function PhotoUpload({
           body: formData
         });
 
-        if (response.ok) {
-          const result = await response.json();
+        const result = await response.json();
+
+        if (response.ok && result.url) {
           uploadedUrls.push(result.url);
         } else {
-          console.error('Failed to upload file:', file.name);
-          alert(`Failed to upload ${file.name}`);
+          const errMsg = result.error || 'Unknown error';
+          console.error('Failed to upload file:', file.name, errMsg);
+          alert(`Failed to upload ${file.name}: ${errMsg}`);
         }
       }
 

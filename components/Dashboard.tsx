@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -54,6 +55,7 @@ interface DashboardProps {
 }
 
 export default function Dashboard({ userType, userId, products = [], orders = [], userStats, userLocation }: DashboardProps) {
+  const router = useRouter();
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [weatherLoading, setWeatherLoading] = useState(true);
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -127,13 +129,13 @@ export default function Dashboard({ userType, userId, products = [], orders = []
   return (
     <div className="space-y-6">
       {/* Welcome Header */}
-      <div className="bg-green-600 rounded-2xl p-6 text-white">
+      <div className="bg-blue-600 rounded-2xl p-6 text-white">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold mb-2">
               Good {currentTime.getHours() < 12 ? 'Morning' : currentTime.getHours() < 17 ? 'Afternoon' : 'Evening'}! 👋
             </h1>
-            <p className="text-green-100">
+            <p className="text-blue-100">
               {userType === 'farmer' 
                 ? "Ready to manage your farm and connect with buyers?" 
                 : "Ready to discover fresh produce from local farmers?"
@@ -141,7 +143,7 @@ export default function Dashboard({ userType, userId, products = [], orders = []
             </p>
           </div>
           <div className="text-right">
-            <div className="text-sm text-green-100">
+            <div className="text-sm text-blue-100">
               {currentTime.toLocaleDateString('en-IN', { 
                 weekday: 'long', 
                 year: 'numeric', 
@@ -432,7 +434,10 @@ export default function Dashboard({ userType, userId, products = [], orders = []
           <div className="space-y-3">
             {userType === 'farmer' ? (
               <>
-                <button className="w-full flex items-center p-3 bg-green-50 hover:bg-green-100 rounded-lg transition-colors text-left">
+                <button 
+                  onClick={() => router.push('/dashboard/farmer/add-product')}
+                  className="w-full flex items-center p-3 bg-green-50 hover:bg-green-100 rounded-lg transition-colors text-left"
+                >
                   <Package className="w-5 h-5 text-green-600 mr-3" />
                   <div>
                     <p className="font-medium text-gray-900">Add New Product</p>
@@ -440,7 +445,10 @@ export default function Dashboard({ userType, userId, products = [], orders = []
                   </div>
                 </button>
                 
-                <button className="w-full flex items-center p-3 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors text-left">
+                <button 
+                  onClick={() => router.push('/dashboard/farmer/my-crops')}
+                  className="w-full flex items-center p-3 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors text-left"
+                >
                   <BarChart3 className="w-5 h-5 text-blue-600 mr-3" />
                   <div>
                     <p className="font-medium text-gray-900">View Analytics</p>
@@ -448,7 +456,10 @@ export default function Dashboard({ userType, userId, products = [], orders = []
                   </div>
                 </button>
                 
-                <button className="w-full flex items-center p-3 bg-orange-50 hover:bg-orange-100 rounded-lg transition-colors text-left">
+                <button 
+                  onClick={() => router.push('/dashboard/farmer/order-requests')}
+                  className="w-full flex items-center p-3 bg-orange-50 hover:bg-orange-100 rounded-lg transition-colors text-left"
+                >
                   <Users className="w-5 h-5 text-orange-600 mr-3" />
                   <div>
                     <p className="font-medium text-gray-900">Order Requests</p>
@@ -458,7 +469,10 @@ export default function Dashboard({ userType, userId, products = [], orders = []
               </>
             ) : (
               <>
-                <button className="w-full flex items-center p-3 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors text-left">
+                <button 
+                  onClick={() => router.push('/dashboard/buyer/browse')}
+                  className="w-full flex items-center p-3 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors text-left"
+                >
                   <ShoppingCart className="w-5 h-5 text-blue-600 mr-3" />
                   <div>
                     <p className="font-medium text-gray-900">Browse Products</p>
@@ -466,7 +480,10 @@ export default function Dashboard({ userType, userId, products = [], orders = []
                   </div>
                 </button>
                 
-                <button className="w-full flex items-center p-3 bg-green-50 hover:bg-green-100 rounded-lg transition-colors text-left">
+                <button 
+                  onClick={() => router.push('/dashboard/buyer/my-orders')}
+                  className="w-full flex items-center p-3 bg-green-50 hover:bg-green-100 rounded-lg transition-colors text-left"
+                >
                   <Package className="w-5 h-5 text-green-600 mr-3" />
                   <div>
                     <p className="font-medium text-gray-900">My Orders</p>
@@ -474,7 +491,10 @@ export default function Dashboard({ userType, userId, products = [], orders = []
                   </div>
                 </button>
                 
-                <button className="w-full flex items-center p-3 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors text-left">
+                <button 
+                  onClick={() => router.push('/dashboard/buyer/suppliers')}
+                  className="w-full flex items-center p-3 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors text-left"
+                >
                   <Users className="w-5 h-5 text-purple-600 mr-3" />
                   <div>
                     <p className="font-medium text-gray-900">Find Suppliers</p>

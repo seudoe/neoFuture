@@ -222,7 +222,7 @@ export default function Dashboard({ userType, userId, products = [], orders = []
   return (
     <div className="space-y-6">
       {/* Welcome Header */}
-      <div className="bg-blue-600 rounded-2xl p-6 text-white">
+      <div className={`${userType === 'farmer' ? 'bg-green-600' : 'bg-blue-600'} rounded-2xl p-6 text-white`}>
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold mb-2">{getGreeting()}! 👋</h1>

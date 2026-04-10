@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useI18n } from '@/lib/i18n/context';
-import { Plus, MapPin, Calculator, Tag, ImageIcon } from 'lucide-react';
+import { Plus, MapPin, Calculator, Tag, ImageIcon, Loader2 } from 'lucide-react';
 import { useDashboardData } from '@/lib/hooks/useDashboardData';
 import { usePricePrediction } from '@/lib/hooks/usePricePrediction';
 import { matchState, getStateSuggestions } from '@/lib/utils/state-matcher';
@@ -17,6 +17,7 @@ export default function AddProductPage() {
   const { user } = useDashboardData('seller');
   
   const [selectedPhotos, setSelectedPhotos] = useState<File[]>([]);
+  const [submitting, setSubmitting] = useState(false);
   const [productName, setProductName] = useState('');
   const [locationState, setLocationState] = useState('');
   const [stateSuggestions, setStateSuggestions] = useState<string[]>([]);
@@ -72,6 +73,7 @@ export default function AddProductPage() {
   const handleAddProduct = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!user) return;
+    setSubmitting(true);
 
     const formData = new FormData(e.target as HTMLFormElement);
     const productData = {
@@ -135,6 +137,8 @@ export default function AddProductPage() {
     } catch (error) {
       console.error('Error adding product:', error);
       toast.error('Error adding product. Please try again.');
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -343,9 +347,17 @@ export default function AddProductPage() {
           <div className="flex flex-col sm:flex-row gap-4 pt-6">
             <button
               type="submit"
-              className="flex-1 bg-green-600 text-white py-3 px-6 rounded-xl font-medium hover:bg-green-700 transition-colors"
+              disabled={submitting}
+              className="flex-1 bg-green-600 text-white py-3 px-6 rounded-xl font-medium hover:bg-green-700 transition-colors disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
-              {t('forms.addProduct')}
+              {submitting ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Adding...
+                </>
+              ) : (
+                t('forms.addProduct')
+              )}
             </button>
             <button
               type="button"

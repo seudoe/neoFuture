@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useI18n } from '@/lib/i18n/context';
 import { 
   TrendingUp, 
@@ -55,6 +56,7 @@ interface DashboardProps {
 }
 
 export default function Dashboard({ userType, userId, products = [], orders = [], userStats, userLocation }: DashboardProps) {
+  const router = useRouter();
   const { t } = useI18n();
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [weatherLoading, setWeatherLoading] = useState(true);
@@ -376,21 +378,27 @@ export default function Dashboard({ userType, userId, products = [], orders = []
           <div className="space-y-3">
             {userType === 'farmer' ? (
               <>
-                <button className="w-full flex items-center p-3 bg-green-50 hover:bg-green-100 rounded-lg transition-colors text-left">
+                <button
+                  onClick={() => router.push('/dashboard/farmer/add-product')}
+                  className="w-full flex items-center p-3 bg-green-50 hover:bg-green-100 rounded-lg transition-colors text-left">
                   <Package className="w-5 h-5 text-green-600 mr-3" />
                   <div>
                     <p className="font-medium text-gray-900">{t('dashboard.addNewProduct')}</p>
                     <p className="text-xs text-gray-500">{t('dashboard.listFreshProduce')}</p>
                   </div>
                 </button>
-                <button className="w-full flex items-center p-3 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors text-left">
+                <button
+                  onClick={() => router.push('/dashboard/farmer/my-crops')}
+                  className="w-full flex items-center p-3 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors text-left">
                   <BarChart3 className="w-5 h-5 text-blue-600 mr-3" />
                   <div>
                     <p className="font-medium text-gray-900">{t('dashboard.viewAnalytics')}</p>
                     <p className="text-xs text-gray-500">{t('dashboard.checkPerformance')}</p>
                   </div>
                 </button>
-                <button className="w-full flex items-center p-3 bg-orange-50 hover:bg-orange-100 rounded-lg transition-colors text-left">
+                <button
+                  onClick={() => router.push('/dashboard/farmer/order-requests')}
+                  className="w-full flex items-center p-3 bg-orange-50 hover:bg-orange-100 rounded-lg transition-colors text-left">
                   <Users className="w-5 h-5 text-orange-600 mr-3" />
                   <div>
                     <p className="font-medium text-gray-900">{t('dashboard.orderRequests')}</p>
@@ -400,21 +408,27 @@ export default function Dashboard({ userType, userId, products = [], orders = []
               </>
             ) : (
               <>
-                <button className="w-full flex items-center p-3 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors text-left">
+                <button
+                  onClick={() => router.push('/dashboard/buyer/browse')}
+                  className="w-full flex items-center p-3 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors text-left">
                   <ShoppingCart className="w-5 h-5 text-blue-600 mr-3" />
                   <div>
                     <p className="font-medium text-gray-900">{t('dashboard.browseProducts')}</p>
                     <p className="text-xs text-gray-500">{t('dashboard.findFreshProduceShort')}</p>
                   </div>
                 </button>
-                <button className="w-full flex items-center p-3 bg-green-50 hover:bg-green-100 rounded-lg transition-colors text-left">
+                <button
+                  onClick={() => router.push('/dashboard/buyer/my-orders')}
+                  className="w-full flex items-center p-3 bg-green-50 hover:bg-green-100 rounded-lg transition-colors text-left">
                   <Package className="w-5 h-5 text-green-600 mr-3" />
                   <div>
                     <p className="font-medium text-gray-900">{t('dashboard.myOrders')}</p>
                     <p className="text-xs text-gray-500">{t('dashboard.trackPurchases')}</p>
                   </div>
                 </button>
-                <button className="w-full flex items-center p-3 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors text-left">
+                <button
+                  onClick={() => router.push('/dashboard/buyer/suppliers')}
+                  className="w-full flex items-center p-3 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors text-left">
                   <Users className="w-5 h-5 text-purple-600 mr-3" />
                   <div>
                     <p className="font-medium text-gray-900">{t('dashboard.findSuppliers')}</p>

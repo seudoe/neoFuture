@@ -118,7 +118,13 @@ export default function FarmerOrdersPage() {
         ) : (
           <div className="space-y-4">
             {orders.map((order) => (
-              <div key={order.id} className="border border-gray-200 rounded-xl p-6">
+              <div key={order.id} className={`border-2 rounded-xl p-6 ${
+                order.status === 'pending'   ? 'border-yellow-300 bg-yellow-50/30' :
+                order.status === 'confirmed' ? 'border-blue-300 bg-blue-50/30' :
+                order.status === 'shipped'   ? 'border-purple-300 bg-purple-50/30' :
+                order.status === 'delivered' ? 'border-green-300 bg-green-50/30' :
+                'border-red-300 bg-red-50/30'
+              }`}>
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center space-x-4">
                     <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">

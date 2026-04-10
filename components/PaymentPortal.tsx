@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { X, CreditCard, MapPin, User, Phone, Mail, CheckCircle } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 interface CartItem {
   id: number;
@@ -117,7 +118,7 @@ export default function PaymentPortal({
     if (step === 1) {
       // Validate form
       if (!formData.fullName || !formData.email || !formData.phone || !formData.address) {
-        alert('Please fill in all required fields');
+        toast.error('Please fill in all required fields');
         return;
       }
       setStep(2);

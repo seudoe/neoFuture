@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { MessageCircle, X, Send, Mic, MicOff, Loader2 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 interface ChatMessage {
   role: 'user' | 'assistant';
@@ -224,7 +225,7 @@ How can I help you today?`,
 
   const toggleVoiceRecognition = () => {
     if (!recognition) {
-      alert('Voice recognition is not supported in your browser');
+      toast.error('Voice recognition is not supported in your browser');
       return;
     }
 

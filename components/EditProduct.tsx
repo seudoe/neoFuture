@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { X, Save, Trash2, ImageIcon, Plus, Tag, Calculator, MapPin } from 'lucide-react';
+import toast from 'react-hot-toast';
 import PhotoUpload from './PhotoUpload';
 import { supabaseClient } from '@/lib/supabase';
 
@@ -143,14 +144,14 @@ export default function EditProduct({
         };
         onSave(updatedProduct);
         onClose();
-        alert('Product updated successfully!');
+        toast.success('Product updated successfully!');
       } else {
         console.error('Failed to update product:', result);
-        alert(`Failed to update product: ${result.error || 'Unknown error'}`);
+        toast.error(`Failed to update product: ${result.error || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('Error updating product:', error);
-      alert('Error updating product. Please try again.');
+      toast.error('Error updating product. Please try again.');
     } finally {
       setSaving(false);
     }
@@ -196,14 +197,14 @@ export default function EditProduct({
       if (response.ok && result.success) {
         onDelete(product.id);
         onClose();
-        alert('Product deleted successfully!');
+        toast.success('Product deleted successfully!');
       } else {
         console.error('Failed to delete product:', result);
-        alert(`Failed to delete product: ${result.error || 'Unknown error'}`);
+        toast.error(`Failed to delete product: ${result.error || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('Error deleting product:', error);
-      alert('Error deleting product. Please try again.');
+      toast.error('Error deleting product. Please try again.');
     } finally {
       setSaving(false);
       setShowDeleteConfirm(false);

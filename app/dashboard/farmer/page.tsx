@@ -37,6 +37,7 @@ import LanguageSwitcher from '@/components/LanguageSwitcher';
 import Dashboard from '@/components/Dashboard';
 import { usePricePrediction } from '@/lib/hooks/usePricePrediction';
 import { matchState, getStateSuggestions } from '@/lib/utils/state-matcher';
+import toast from 'react-hot-toast';
 
 interface User {
   id: number;
@@ -308,11 +309,11 @@ export default function FarmerDashboard() {
         setShowSuggestions(false); // Hide suggestions
         setStateSuggestions([]); // Clear suggestions
         
-        alert('Product added successfully!');
+        toast.success('Product added successfully!');
       }
     } catch (error) {
       console.error('Error adding product:', error);
-      alert('Error adding product. Please try again.');
+      toast.error('Error adding product. Please try again.');
     }
   };
 
@@ -337,7 +338,7 @@ export default function FarmerDashboard() {
         setActiveTab('my-crops');
         setNewProductId(null);
         setSelectedPhotos([]);
-        alert('Product and photos uploaded successfully!');
+        toast.success('Product and photos uploaded successfully!');
       }
     } catch (error) {
       console.error('Error updating product photos:', error);
@@ -394,13 +395,13 @@ export default function FarmerDashboard() {
         if (user) {
           fetchOrders(user.id);
         }
-        alert(`Order ${status} successfully!`);
+        toast.success(`Order ${status} successfully!`);
       } else {
-        alert(`Failed to ${status} order: ${result.error}`);
+        toast.error(`Failed to ${status} order: ${result.error}`);
       }
     } catch (error) {
       console.error('Error updating order status:', error);
-      alert('Error updating order status');
+      toast.error('Error updating order status');
     }
   };
 
@@ -439,7 +440,7 @@ export default function FarmerDashboard() {
           ...prev,
           [selectedOrderForRating.id]: result.rating
         }));
-        alert(existingRating ? 'Rating updated successfully!' : 'Rating submitted successfully!');
+        toast.success(existingRating ? 'Rating updated successfully!' : 'Rating submitted successfully!');
       } else {
         // Check if it's a table missing error
         if (result.error?.includes('Ratings table does not exist')) {
@@ -450,12 +451,12 @@ export default function FarmerDashboard() {
             window.open('/setup', '_blank');
           }
         } else {
-          alert(result.error || 'Failed to submit rating');
+          toast.error(result.error || 'Failed to submit rating');
         }
       }
     } catch (error) {
       console.error('Error submitting rating:', error);
-      alert('Error submitting rating. Please check your connection and try again.');
+      toast.error('Error submitting rating. Please check your connection and try again.');
     }
   };
 

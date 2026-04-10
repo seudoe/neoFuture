@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { ShoppingCart, Plus, Calendar, Users, Package, Clock, CheckCircle, XCircle, AlertCircle, Repeat, Settings, X } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 interface OrderRequest {
   id: number;
@@ -142,7 +143,7 @@ export default function OrderRequests({ userId }: OrderRequestsProps) {
       const data = await response.json();
       
       if (response.ok) {
-        alert('Order request created successfully!');
+        toast.success('Order request created successfully!');
         setShowCreateForm(false);
         setFormData({
           product_name: '',
@@ -154,11 +155,11 @@ export default function OrderRequests({ userId }: OrderRequestsProps) {
         });
         fetchOrderRequests();
       } else {
-        alert(`Error: ${data.error}`);
+        toast.error(`Error: ${data.error}`);
       }
     } catch (error) {
       console.error('Error creating order request:', error);
-      alert('Error creating order request. Please try again.');
+      toast.error('Error creating order request. Please try again.');
     } finally {
       setSubmitting(false);
     }
@@ -201,7 +202,7 @@ export default function OrderRequests({ userId }: OrderRequestsProps) {
       const data = await response.json();
       
       if (response.ok) {
-        alert(`Order schedule ${isEditing ? 'updated' : 'created'} successfully!`);
+        toast.success(`Order schedule ${isEditing ? 'updated' : 'created'} successfully!`);
         setShowScheduleForm(false);
         setEditingScheduleId(null);
         setScheduleFormData({
@@ -216,11 +217,11 @@ export default function OrderRequests({ userId }: OrderRequestsProps) {
         });
         fetchOrderSchedules();
       } else {
-        alert(`Error: ${data.error}`);
+        toast.error(`Error: ${data.error}`);
       }
     } catch (error) {
       console.error('Error saving order schedule:', error);
-      alert('Error saving order schedule. Please try again.');
+      toast.error('Error saving order schedule. Please try again.');
     } finally {
       setSubmitting(false);
     }
@@ -243,14 +244,14 @@ export default function OrderRequests({ userId }: OrderRequestsProps) {
       const data = await response.json();
       
       if (response.ok) {
-        alert(`Schedule ${!isActive ? 'activated' : 'paused'} successfully!`);
+        toast.success(`Schedule ${!isActive ? 'activated' : 'paused'} successfully!`);
         fetchOrderSchedules();
       } else {
-        alert(`Error: ${data.error}`);
+        toast.error(`Error: ${data.error}`);
       }
     } catch (error) {
       console.error('Error updating schedule:', error);
-      alert('Error updating schedule. Please try again.');
+      toast.error('Error updating schedule. Please try again.');
     }
   };
 
@@ -292,7 +293,7 @@ export default function OrderRequests({ userId }: OrderRequestsProps) {
             return handleProcessSchedules(true); // Recursive call with force=true
           }
         } else {
-          alert('No active schedules found.');
+          toast('No active schedules found.');
         }
         return;
       }
@@ -312,18 +313,18 @@ export default function OrderRequests({ userId }: OrderRequestsProps) {
       
       if (response.ok) {
         if (data.processed > 0) {
-          alert(`✅ Successfully processed ${data.processed} schedule(s)!\n\n${force ? '🔧 FORCE MODE: ' : ''}New order requests have been created and are now visible to farmers.`);
+          toast.success(`Successfully processed ${data.processed} schedule(s)! ${force ? 'FORCE MODE: ' : ''}New order requests have been created.`);
         } else {
-          alert(`ℹ️ ${data.message}\n\n${data.info || ''}`);
+          toast(`${data.message}`);
         }
         fetchOrderRequests();
         fetchOrderSchedules();
       } else {
-        alert(`Error: ${data.error}`);
+        toast.error(`Error: ${data.error}`);
       }
     } catch (error) {
       console.error('Error processing schedules:', error);
-      alert('Error processing schedules. Please try again.');
+      toast.error('Error processing schedules. Please try again.');
     } finally {
       setSubmitting(false);
     }
@@ -346,14 +347,14 @@ export default function OrderRequests({ userId }: OrderRequestsProps) {
       const data = await response.json();
       
       if (response.ok) {
-        alert(`Application ${status} successfully!`);
+        toast.success(`Application ${status} successfully!`);
         fetchOrderRequests();
       } else {
-        alert(`Error: ${data.error}`);
+        toast.error(`Error: ${data.error}`);
       }
     } catch (error) {
       console.error('Error updating application:', error);
-      alert('Error updating application. Please try again.');
+      toast.error('Error updating application. Please try again.');
     }
   };
 

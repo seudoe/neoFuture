@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Bell, Package, Calendar, Users, Send, AlertCircle, CheckCircle, Clock, Repeat, X } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 interface OrderRequest {
   id: number;
@@ -90,7 +91,7 @@ export default function FarmerOrderRequests({ userId }: FarmerOrderRequestsProps
       const data = await response.json();
       
       if (response.ok) {
-        alert('Application submitted successfully!');
+        toast.success('Application submitted successfully!');
         setShowApplicationForm(null);
         setApplicationData({
           price_per_unit: '',
@@ -100,11 +101,11 @@ export default function FarmerOrderRequests({ userId }: FarmerOrderRequestsProps
         });
         fetchOrderRequests();
       } else {
-        alert(`Error: ${data.error}`);
+        toast.error(`Error: ${data.error}`);
       }
     } catch (error) {
       console.error('Error submitting application:', error);
-      alert('Error submitting application. Please try again.');
+      toast.error('Error submitting application. Please try again.');
     } finally {
       setSubmitting(false);
     }

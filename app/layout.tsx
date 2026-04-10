@@ -4,6 +4,7 @@ import "./globals.css";
 import ChatbotButton from "@/components/ChatbotButton";
 import PWAInstallPrompt from "@/components/PWAInstallPrompt";
 import { I18nProvider } from "@/lib/i18n/context";
+import { Toaster } from "react-hot-toast";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -55,6 +56,7 @@ export default function RootLayout({
       >
         <I18nProvider>
           {children}
+          <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
           <ChatbotButton />
           <PWAInstallPrompt />
         </I18nProvider>

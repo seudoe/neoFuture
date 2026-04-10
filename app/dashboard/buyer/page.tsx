@@ -29,6 +29,7 @@ import Dashboard from '@/components/Dashboard';
 import OrderRequests from '@/components/OrderRequests';
 import ReorderModal from '@/components/ReorderModal';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
+import toast from 'react-hot-toast';
 
 interface User {
   id: number;
@@ -260,13 +261,13 @@ export default function BuyerDashboard() {
         if (user) {
           fetchOrders(user.id);
         }
-        alert(`Order ${status} successfully!`);
+        toast.success(`Order ${status} successfully!`);
       } else {
-        alert(`Failed to ${status} order: ${result.error}`);
+        toast.error(`Failed to ${status} order: ${result.error}`);
       }
     } catch (error) {
       console.error('Error updating order status:', error);
-      alert('Error updating order status');
+      toast.error('Error updating order status');
     }
   };
 
@@ -305,7 +306,7 @@ export default function BuyerDashboard() {
           ...prev,
           [selectedOrderForRating.id]: result.rating
         }));
-        alert(existingRating ? 'Rating updated successfully!' : 'Rating submitted successfully!');
+        toast.success(existingRating ? 'Rating updated successfully!' : 'Rating submitted successfully!');
       } else {
         // Check if it's a table missing error
         if (result.error?.includes('Ratings table does not exist')) {
@@ -316,12 +317,12 @@ export default function BuyerDashboard() {
             window.open('/setup', '_blank');
           }
         } else {
-          alert(result.error || 'Failed to submit rating');
+          toast.error(result.error || 'Failed to submit rating');
         }
       }
     } catch (error) {
       console.error('Error submitting rating:', error);
-      alert('Error submitting rating. Please check your connection and try again.');
+      toast.error('Error submitting rating. Please check your connection and try again.');
     }
   };
 
@@ -356,13 +357,13 @@ export default function BuyerDashboard() {
       if (result.success) {
         // Refresh orders to show the new order
         fetchOrders(user.id);
-        alert(`Reorder placed successfully! New order #${result.order.id} has been created for ${quantity}kg.`);
+        toast.success(`Reorder placed successfully! New order #${result.order.id} has been created for ${quantity}kg.`);
       } else {
-        alert(result.error || 'Failed to place reorder');
+        toast.error(result.error || 'Failed to place reorder');
       }
     } catch (error) {
       console.error('Error placing reorder:', error);
-      alert('Error placing reorder. Please try again.');
+      toast.error('Error placing reorder. Please try again.');
     }
   };
 
@@ -383,14 +384,14 @@ export default function BuyerDashboard() {
       const result = await response.json();
       if (result.success) {
         fetchCart(user.id); // Refresh cart
-        alert(`${quantity}kg added to cart!`);
+        toast.success(`${quantity}kg added to cart!`);
         setSelectedQuantity(prev => ({ ...prev, [productId]: 1 })); // Reset quantity
       } else {
-        alert(result.message || 'Failed to add to cart');
+        toast.error(result.message || 'Failed to add to cart');
       }
     } catch (error) {
       console.error('Error adding to cart:', error);
-      alert('Error adding to cart');
+      toast.error('Error adding to cart');
     }
   };
 
@@ -433,11 +434,11 @@ export default function BuyerDashboard() {
       const result = await response.json();
       if (result.success) {
         fetchCart(user.id); // Refresh cart
-        alert('Product removed from cart!');
+        toast.success('Product removed from cart!');
       }
     } catch (error) {
       console.error('Error removing from cart:', error);
-      alert('Error removing from cart');
+      toast.error('Error removing from cart');
     }
   };
 

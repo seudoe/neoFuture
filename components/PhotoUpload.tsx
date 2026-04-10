@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { X, Camera } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 interface PhotoUploadProps {
   onPhotosChange: (photos: File[]) => void;
@@ -59,7 +60,7 @@ export default function PhotoUpload({
         } else {
           const errMsg = result.error || 'Unknown error';
           console.error('Failed to upload file:', file.name, errMsg);
-          alert(`Failed to upload ${file.name}: ${errMsg}`);
+          toast.error(`Failed to upload ${file.name}: ${errMsg}`);
         }
       }
 
@@ -69,7 +70,7 @@ export default function PhotoUpload({
 
     } catch (error) {
       console.error('Upload error:', error);
-      alert('Error uploading photos. Please try again.');
+      toast.error('Error uploading photos. Please try again.');
     } finally {
       setUploading(false);
     }
@@ -164,7 +165,7 @@ export default function PhotoUpload({
       
     } catch (error) {
       console.error('Error accessing camera:', error);
-      alert('Unable to access camera. Please check permissions and try again.');
+      toast.error('Unable to access camera. Please check permissions and try again.');
     }
   };
 
@@ -178,7 +179,7 @@ export default function PhotoUpload({
 
   const capturePhoto = async () => {
     if (!videoRef.current || !canvasRef.current) {
-      alert('Camera not ready. Please try again.');
+      toast.error('Camera not ready. Please try again.');
       return;
     }
 
@@ -187,7 +188,7 @@ export default function PhotoUpload({
     const context = canvas.getContext('2d');
 
     if (!context) {
-      alert('Unable to capture photo. Please try again.');
+      toast.error('Unable to capture photo. Please try again.');
       return;
     }
 
@@ -239,7 +240,7 @@ export default function PhotoUpload({
     // Convert canvas to blob
     canvas.toBlob(async (blob) => {
       if (!blob) {
-        alert('Failed to capture photo. Please try again.');
+        toast.error('Failed to capture photo. Please try again.');
         return;
       }
 
@@ -261,7 +262,7 @@ export default function PhotoUpload({
 
       const totalFiles = selectedFiles.length + 1;
       if (totalFiles > maxPhotos) {
-        alert(`You can only upload up to ${maxPhotos} photos`);
+        toast.error(`You can only upload up to ${maxPhotos} photos`);
         return;
       }
 
@@ -275,13 +276,13 @@ export default function PhotoUpload({
       // Upload immediately if userId and productId are provided
       if (userId && productId) {
         await uploadFiles([file]);
-        alert('Photo captured and uploaded successfully!');
+        toast.success('Photo captured and uploaded successfully!');
       } else {
         // Store locally if no upload info
         const updatedFiles = [...selectedFiles, file];
         setSelectedFiles(updatedFiles);
         onPhotosChange(updatedFiles);
-        alert('Photo captured successfully! It will be uploaded with your product.');
+        toast.success('Photo captured successfully! It will be uploaded with your product.');
       }
     }, 'image/jpeg', 0.9);
   };

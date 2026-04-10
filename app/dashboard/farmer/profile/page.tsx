@@ -5,17 +5,26 @@ import { useI18n } from '@/lib/i18n/context';
 import { User, Target, Briefcase, TrendingUp, Package, CheckCircle, Star, Edit2, Save, X } from 'lucide-react';
 import { useDashboardData, useRatings } from '@/lib/hooks/useDashboardData';
 import UserRatingDisplay from '@/components/UserRatingDisplay';
+import toast from 'react-hot-toast';
 
 export default function FarmerProfilePage() {
   const { t } = useI18n();
   const { user } = useDashboardData('seller');
   const { userStats, loading: statsLoading } = useRatings(user?.id, 'seller');
-
+  const [isEditing, setIsEditing] = useState(false);
+  const [formData, setFormData] = useState({ name: '', email: '', phone_number: '' });
+  const [saving, setSaving] = useState(false);
   const [jobStats, setJobStats] = useState({ posted: 0, completed: 0, applied: 0, jobsCompleted: 0 });
   const [goals, setGoals] = useState({ monthlyRevenue: '' });
   const [savedGoals, setSavedGoals] = useState({ monthlyRevenue: 0 });
   const [editingGoals, setEditingGoals] = useState(false);
   const [savingGoals, setSavingGoals] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      setFormData({ name: user.name || '', email: user.email || '', phone_number: user.phone_number || '' });
+    }
+  }, [user]);
 
   useEffect(() => {
     if (!user) return;
@@ -54,6 +63,45 @@ export default function FarmerProfilePage() {
     } catch {}
   };
 
+  const handleEdit = () => {
+    setFormData({ name: user?.name || '', email: user?.email || '', phone_number: user?.phone_number || '' });
+    setIsEditing(true);
+  };
+
+  const handleCancel = () => {
+    setIsEditing(false);
+    setFormData({ name: user?.name || '', email: user?.email || '', phone_number: user?.phone_number || '' });
+  };
+
+  const handleSave = async () => {
+    if (!user) return;
+    if (!formData.name.trim()) { toast.error('Name is required'); return; }
+    if (!formData.email.trim()) { toast.error('Email is required'); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) { toast.error('Please enter a valid email'); return; }
+
+    setSaving(true);
+    try {
+      const response = await fetch('/api/users', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user.id, ...formData })
+      });
+      const result = await response.json();
+      if (result.success) {
+        localStorage.setItem('user', JSON.stringify({ ...user, ...formData }));
+        toast.success('Profile updated successfully!');
+        setIsEditing(false);
+        window.location.reload();
+      } else {
+        toast.error(result.error || 'Failed to update profile');
+      }
+    } catch {
+      toast.error('Error updating profile');
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const saveGoals = async () => {
     if (!user) return;
     const parsed = { monthlyRevenue: Number(goals.monthlyRevenue) || 0 };
@@ -81,9 +129,7 @@ export default function FarmerProfilePage() {
 
   return (
     <div className="space-y-6">
-      {stats && (
-        <UserRatingDisplay stats={stats} userType="seller" isLoading={statsLoading} />
-      )}
+      {stats && <UserRatingDisplay stats={stats} userType="seller" isLoading={statsLoading} />}
 
       {/* Profile Info */}
       <div className="bg-white rounded-2xl shadow-sm p-4 lg:p-8">
@@ -95,7 +141,14 @@ export default function FarmerProfilePage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">{t('forms.fullName')}</label>
-              <div className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900">{user.name}</div>
+              {isEditing ? (
+                <input type="text" value={formData.name}
+                  onChange={e => setFormData({ ...formData, name: e.target.value })}
+                  className="w-full px-4 py-3 border border-green-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500"
+                  placeholder="Enter your name" />
+              ) : (
+                <div className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900">{user.name}</div>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">{t('forms.role')}</label>
@@ -103,17 +156,47 @@ export default function FarmerProfilePage() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">{t('forms.emailAddress')}</label>
-              <div className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900">{user.email}</div>
+              {isEditing ? (
+                <input type="email" value={formData.email}
+                  onChange={e => setFormData({ ...formData, email: e.target.value })}
+                  className="w-full px-4 py-3 border border-green-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500"
+                  placeholder="Enter your email" />
+              ) : (
+                <div className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900">{user.email}</div>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">{t('forms.phoneNumber')}</label>
-              <div className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900">{user.phone_number || t('forms.notProvided')}</div>
+              {isEditing ? (
+                <input type="tel" value={formData.phone_number}
+                  onChange={e => setFormData({ ...formData, phone_number: e.target.value })}
+                  className="w-full px-4 py-3 border border-green-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500"
+                  placeholder="Enter your phone number" />
+              ) : (
+                <div className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900">
+                  {user.phone_number || t('forms.notProvided')}
+                </div>
+              )}
             </div>
           </div>
-          <div className="mt-8">
-            <button className="px-6 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors">
-              {t('forms.editProfile')}
-            </button>
+          <div className="mt-8 flex gap-3">
+            {isEditing ? (
+              <>
+                <button onClick={handleSave} disabled={saving}
+                  className="px-6 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                  <Save className="w-4 h-4" />{saving ? 'Saving...' : 'Save Changes'}
+                </button>
+                <button onClick={handleCancel} disabled={saving}
+                  className="px-6 py-3 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                  <X className="w-4 h-4" />Cancel
+                </button>
+              </>
+            ) : (
+              <button onClick={handleEdit}
+                className="px-6 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors">
+                {t('forms.editProfile')}
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -203,11 +286,11 @@ export default function FarmerProfilePage() {
             </div>
           )}
         </div>
-
         {editingGoals ? (
           <div className="max-w-xs">
             <label className="block text-sm font-medium text-gray-700 mb-1">Monthly Revenue Target (₹)</label>
-            <input type="number" value={goals.monthlyRevenue} onChange={e => setGoals({ monthlyRevenue: e.target.value })}
+            <input type="number" value={goals.monthlyRevenue}
+              onChange={e => setGoals({ monthlyRevenue: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none"
               placeholder="e.g. 50000" />
           </div>

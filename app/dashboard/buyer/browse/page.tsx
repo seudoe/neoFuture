@@ -87,6 +87,11 @@ export default function BrowseProductsPage() {
                   <div className={`fallback-icon w-full h-full flex items-center justify-center ${product.photos && product.photos.length > 0 ? 'absolute inset-0' : ''}`} style={{ display: product.photos && product.photos.length > 0 ? 'none' : 'flex' }}>
                     <ImageIcon className="w-8 h-8 text-gray-400" />
                   </div>
+                  {product.quantity === 0 && (
+                    <div className="absolute inset-0 bg-black bg-opacity-40 rounded-lg flex items-center justify-center">
+                      <span className="bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full">OUT OF STOCK</span>
+                    </div>
+                  )}
                 </div>
                 <h3 className="font-semibold text-gray-900 mb-2">{product.name}</h3>
                 <div className="space-y-1 text-sm text-gray-600 mb-3">
@@ -125,18 +130,25 @@ export default function BrowseProductsPage() {
                       }))}
                       className="w-16 px-2 py-1 border border-gray-300 rounded text-sm text-center"
                       onClick={(e) => e.stopPropagation()}
+                      disabled={product.quantity === 0}
                     />
                     <span className="text-xs text-gray-700">kg</span>
                   </div>
-                  <button 
-                    className="flex-1 px-3 py-2 bg-blue-100 text-blue-700 rounded-lg text-sm hover:bg-blue-200 transition-colors"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      addToCart(product.id, selectedQuantity[product.id] || 1);
-                    }}
-                  >
-                    {t('Add to Cart')}
-                  </button>
+                  {product.quantity === 0 ? (
+                    <div className="flex-1 px-3 py-2 bg-red-50 text-red-500 rounded-lg text-sm text-center font-medium border border-red-200">
+                      Out of Stock
+                    </div>
+                  ) : (
+                    <button 
+                      className="flex-1 px-3 py-2 bg-blue-100 text-blue-700 rounded-lg text-sm hover:bg-blue-200 transition-colors"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        addToCart(product.id, selectedQuantity[product.id] || 1);
+                      }}
+                    >
+                      {t('Add to Cart')}
+                    </button>
+                  )}
                 </div>
               </div>
             ))}

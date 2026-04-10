@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
         // Fetch user basic info
         const { data: user, error: userError } = await supabase
             .from('users')
-            .select('id, name, email, phone_number, role, created_at')
+            .select('id, name, email, phone_number, role, created_at, goals')
             .eq('id', parseInt(userId))
             .single();
 
@@ -99,13 +99,14 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({
             user,
             stats: {
-                averageRating: Math.round(averageRating * 10) / 10, // Round to 1 decimal
+                averageRating: Math.round(averageRating * 10) / 10,
                 totalRatings,
                 ratingDistribution,
                 totalOrders,
                 completedOrders,
                 totalValue,
                 joinedDate: user.created_at,
+                revenueGoal: (user as any).goals?.monthlyRevenue || 0,
                 ...additionalStats
             }
         });

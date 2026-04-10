@@ -67,14 +67,14 @@ export default function BuyerLayout({ children }: { children: React.ReactNode })
                   <Sprout className="w-5 h-5 text-white" />
                 </div>
                 <h1 className="ml-3 text-xl font-semibold text-gray-900">AgriBridge</h1>
-                <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">Buyer</span>
+                <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">{t('auth.buyer')}</span>
               </div>
             </div>
             <div className="flex items-center space-x-4">
               <LanguageSwitcher />
               <span className="text-sm text-gray-600">{t('farmer.welcome')}, {user.name}</span>
               <button onClick={handleLogout} className="text-sm text-white hover:text-gray-700 px-4 py-1 bg-red-400 rounded-lg">
-                Logout
+                {t('auth.logout')}
               </button>
             </div>
           </div>
@@ -87,12 +87,12 @@ export default function BuyerLayout({ children }: { children: React.ReactNode })
                   <Sprout className="w-5 h-5 text-white" />
                 </div>
                 <h1 className="ml-3 text-xl font-semibold text-gray-900">AgriBridge</h1>
-                <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">Buyer</span>
+                <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">{t('auth.buyer')}</span>
               </div>
               <div className="flex items-center space-x-2">
                 <LanguageSwitcher />
                 <button onClick={handleLogout} className="text-sm text-white hover:text-gray-700 px-4 py-1 bg-red-400 rounded-lg">
-                  Logout
+                  {t('auth.logout')}
                 </button>
               </div>
             </div>

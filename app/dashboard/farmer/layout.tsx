@@ -52,7 +52,7 @@ export default function FarmerLayout({ children }: { children: React.ReactNode }
     { id: 'reviews', name: t('farmer.receivedReviews'), icon: Star, path: '/dashboard/farmer/reviews' },
     { id: 'subsidies', name: t('subsidies.title'), icon: Award, path: '/dashboard/farmer/subsidies' },
     { id: 'skill-development', name: t('skillDevelopment.title'), icon: GraduationCap, path: '/dashboard/farmer/skill-development' },
-    { id: 'jobs', name: 'Farm Jobs', icon: Briefcase, path: '/dashboard/farmer/jobs' },
+    { id: 'jobs', name: t('dashboard.farmJobs'), icon: Briefcase, path: '/dashboard/farmer/jobs' },
     { id: 'profile', name: t('navigation.profile'), icon: User, path: '/dashboard/farmer/profile' },
   ];
 
@@ -74,14 +74,14 @@ export default function FarmerLayout({ children }: { children: React.ReactNode }
                   <Sprout className="w-5 h-5 text-white" />
                 </div>
                 <h1 className="ml-3 text-xl font-semibold text-gray-900">AgriBridge</h1>
-                <span className="ml-2 px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Farmer</span>
+                <span className="ml-2 px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">{t('auth.farmer')}</span>
               </div>
             </div>
             <div className="flex items-center space-x-4">
               <LanguageSwitcher />
               <span className="text-sm text-gray-600">{t('farmer.welcome')}, {user.name}</span>
               <button onClick={handleLogout} className="text-sm text-white hover:text-gray-700 px-4 py-1 bg-red-400 rounded-lg">
-                Logout
+                {t('auth.logout')}
               </button>
             </div>
           </div>
@@ -94,12 +94,12 @@ export default function FarmerLayout({ children }: { children: React.ReactNode }
                   <Sprout className="w-5 h-5 text-white" />
                 </div>
                 <h1 className="ml-3 text-xl font-semibold text-gray-900">AgriBridge</h1>
-                <span className="ml-2 px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Farmer</span>
+                <span className="ml-2 px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">{t('auth.farmer')}</span>
               </div>
               <div className="flex items-center space-x-2">
                 <LanguageSwitcher />
                 <button onClick={handleLogout} className="text-sm text-white hover:text-gray-700 px-4 py-1 bg-red-400 rounded-lg">
-                  Logout
+                  {t('auth.logout')}
                 </button>
               </div>
             </div>

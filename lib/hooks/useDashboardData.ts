@@ -37,6 +37,7 @@ export function useProducts(sellerId?: number) {
     try {
       const url = id ? `/api/products?seller_id=${id}` : '/api/products';
       const response = await fetch(url);
+      if (!response.ok) return;
       const data = await response.json();
       setProducts(data.products || []);
     } catch (error) {
@@ -65,6 +66,7 @@ export function useOrders(userId: number | undefined, userType: 'buyer' | 'selle
     if (!userId) return;
     try {
       const response = await fetch(`/api/orders?userId=${userId}&userType=${userType}`);
+      if (!response.ok) return;
       const data = await response.json();
       setOrders(data.orders || []);
     } catch (error) {
@@ -110,6 +112,7 @@ export function useCart(userId: number | undefined) {
     if (!userId) return;
     try {
       const response = await fetch(`/api/cart?userId=${userId}`);
+      if (!response.ok) return;
       const data = await response.json();
       setCartItems(data.cart?.products || []);
     } catch (error) {
@@ -197,6 +200,7 @@ export function useSuppliers() {
     const fetchSuppliers = async () => {
       try {
         const response = await fetch('/api/suppliers');
+        if (!response.ok) return;
         const data = await response.json();
         setSuppliers(data.suppliers || []);
       } catch (error) {
@@ -227,11 +231,15 @@ export function useRatings(userId: number | undefined, userType: 'buyer' | 'sell
           fetch(`/api/user-stats?userId=${userId}&userType=${userType}`)
         ]);
 
-        const ratingsData = await ratingsRes.json();
-        const statsData = await statsRes.json();
+        if (ratingsRes.ok) {
+          const ratingsData = await ratingsRes.json();
+          setReceivedRatings(ratingsData.ratings || []);
+        }
 
-        setReceivedRatings(ratingsData.ratings || []);
-        setUserStats(statsData);
+        if (statsRes.ok) {
+          const statsData = await statsRes.json();
+          setUserStats(statsData);
+        }
       } catch (error) {
         console.error('Error fetching ratings:', error);
       } finally {

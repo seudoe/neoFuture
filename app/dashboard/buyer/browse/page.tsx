@@ -9,10 +9,10 @@ import ProductDetails from '@/components/ProductDetails';
 type SortMode = 'recommended' | 'price_asc' | 'price_desc' | 'newest';
 
 const SORT_OPTIONS: { value: SortMode; label: string; icon: React.ReactNode }[] = [
-  { value: 'recommended', label: 'Recommended',  icon: <Sparkles className="w-3.5 h-3.5" /> },
+  { value: 'recommended', label: 'Recommended',       icon: <Sparkles className="w-3.5 h-3.5" /> },
   { value: 'price_asc',   label: 'Price: Low → High', icon: <TrendingDown className="w-3.5 h-3.5" /> },
   { value: 'price_desc',  label: 'Price: High → Low', icon: <TrendingDown className="w-3.5 h-3.5 rotate-180" /> },
-  { value: 'newest',      label: 'Newest First', icon: <Clock className="w-3.5 h-3.5" /> },
+  { value: 'newest',      label: 'Newest First',      icon: <Clock className="w-3.5 h-3.5" /> },
 ];
 
 export default function BrowseProductsPage() {
@@ -21,25 +21,21 @@ export default function BrowseProductsPage() {
   const { products, loading } = useProducts();
   const { addToCart } = useCart(user?.id);
 
-  const [searchTerm, setSearchTerm]     = useState('');
-  const [sortMode, setSortMode]         = useState<SortMode>('recommended');
-  const [sortOpen, setSortOpen]         = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<any>(null);
+  const [searchTerm, setSearchTerm]   = useState('');
+  const [sortMode, setSortMode]       = useState<SortMode>('recommended');
+  const [sortOpen, setSortOpen]       = useState(false);
+  const [selectedProduct, setSelectedProduct]     = useState<any>(null);
   const [showProductDetails, setShowProductDetails] = useState(false);
-  const [selectedQuantity, setSelectedQuantity] = useState<Record<number, number>>({});
+  const [selectedQuantity, setSelectedQuantity]   = useState<Record<number, number>>({});
 
-  // Recommendation scores from API
-  const [scoreMap, setScoreMap]         = useState<Record<number, number>>({});
-  const [reasonMap, setReasonMap]       = useState<Record<number, string[]>>({});
+  const [scoreMap, setScoreMap]       = useState<Record<number, number>>({});
+  const [reasonMap, setReasonMap]     = useState<Record<number, string[]>>({});
   const [categoryStats, setCategoryStats] = useState<any[]>([]);
-  const [hasHistory, setHasHistory]     = useState(false);
-  const [recLoading, setRecLoading]     = useState(false);
-  const [showDebug, setShowDebug]       = useState(false);
+  const [hasHistory, setHasHistory]   = useState(false);
+  const [showDebug, setShowDebug]     = useState(false);
 
-  // Fetch recommendation scores once user is known
   useEffect(() => {
     if (!user?.id) return;
-    setRecLoading(true);
     fetch(`/api/recommendations?buyer_id=${user.id}`)
       .then(r => r.json())
       .then(data => {
@@ -56,11 +52,9 @@ export default function BrowseProductsPage() {
         setCategoryStats(data.category_stats ?? []);
         setHasHistory(data.has_history ?? false);
       })
-      .catch(() => {/* silently ignore — sort still works, just scores = 0 */})
-      .finally(() => setRecLoading(false));
+      .catch(() => {});
   }, [user?.id]);
 
-  // Search filter (still available but doesn't remove products — just highlights)
   const searched = useMemo(() =>
     searchTerm.trim()
       ? products.filter(p =>
@@ -72,22 +66,14 @@ export default function BrowseProductsPage() {
     [products, searchTerm]
   );
 
-  // Sort
   const sorted = useMemo(() => {
     const arr = [...searched];
     switch (sortMode) {
-      case 'recommended':
-        return arr.sort((a, b) => (scoreMap[b.id] ?? 0) - (scoreMap[a.id] ?? 0));
-      case 'price_asc':
-        return arr.sort((a, b) => a.price_single - b.price_single);
-      case 'price_desc':
-        return arr.sort((a, b) => b.price_single - a.price_single);
-      case 'newest':
-        return arr.sort((a, b) =>
-          new Date(b.created_at ?? 0).getTime() - new Date(a.created_at ?? 0).getTime()
-        );
-      default:
-        return arr;
+      case 'recommended': return arr.sort((a, b) => (scoreMap[b.id] ?? 0) - (scoreMap[a.id] ?? 0));
+      case 'price_asc':   return arr.sort((a, b) => a.price_single - b.price_single);
+      case 'price_desc':  return arr.sort((a, b) => b.price_single - a.price_single);
+      case 'newest':      return arr.sort((a, b) => new Date(b.created_at ?? 0).getTime() - new Date(a.created_at ?? 0).getTime());
+      default:            return arr;
     }
   }, [searched, sortMode, scoreMap]);
 
@@ -97,13 +83,12 @@ export default function BrowseProductsPage() {
     <>
       <div className="bg-white rounded-2xl shadow-sm p-4 lg:p-8">
 
-        {/* ── Header row ── */}
+        {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
           <div className="flex items-center">
             <ShoppingCart className="w-6 h-6 text-blue-600 mr-3 shrink-0" />
             <h2 className="text-2xl font-bold text-gray-900">Browse Products</h2>
           </div>
-
           <div className="flex items-center gap-2 flex-wrap">
             {/* Search */}
             <div className="relative">
@@ -129,13 +114,9 @@ export default function BrowseProductsPage() {
                 className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-xl text-sm text-gray-700 hover:bg-gray-50 transition-colors"
               >
                 <ArrowUpDown className="w-3.5 h-3.5 text-gray-400" />
-                <span className="flex items-center gap-1.5">
-                  {activeSortLabel.icon}
-                  {activeSortLabel.label}
-                </span>
+                <span className="flex items-center gap-1.5">{activeSortLabel.icon}{activeSortLabel.label}</span>
                 <ChevronDown className={`w-3.5 h-3.5 text-gray-400 transition-transform ${sortOpen ? 'rotate-180' : ''}`} />
               </button>
-
               {sortOpen && (
                 <div className="absolute right-0 top-full mt-1 w-52 bg-white border border-gray-200 rounded-xl shadow-lg z-20 overflow-hidden">
                   {SORT_OPTIONS.map(opt => (
@@ -143,13 +124,10 @@ export default function BrowseProductsPage() {
                       key={opt.value}
                       onClick={() => { setSortMode(opt.value); setSortOpen(false); }}
                       className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-sm transition-colors ${
-                        sortMode === opt.value
-                          ? 'bg-blue-50 text-blue-700 font-medium'
-                          : 'text-gray-700 hover:bg-gray-50'
+                        sortMode === opt.value ? 'bg-blue-50 text-blue-700 font-medium' : 'text-gray-700 hover:bg-gray-50'
                       }`}
                     >
-                      {opt.icon}
-                      {opt.label}
+                      {opt.icon}{opt.label}
                       {opt.value === 'recommended' && !hasHistory && (
                         <span className="ml-auto text-xs text-gray-400">no history yet</span>
                       )}
@@ -163,7 +141,7 @@ export default function BrowseProductsPage() {
           </div>
         </div>
 
-        {/* ── Recommendation context banner ── */}
+        {/* Recommendation banner */}
         {sortMode === 'recommended' && (
           <div className={`mb-4 rounded-xl px-4 py-3 flex items-start gap-3 text-sm ${
             hasHistory ? 'bg-blue-50 border border-blue-100' : 'bg-gray-50 border border-gray-200'
@@ -175,15 +153,11 @@ export default function BrowseProductsPage() {
                   <span className="font-medium text-blue-800">Sorted by your order history.</span>
                   <span className="text-blue-700 ml-1">
                     Based on {categoryStats.length} categor{categoryStats.length === 1 ? 'y' : 'ies'} you've ordered:{' '}
-                    {categoryStats.map(c => (
-                      <span key={c.category} className="font-medium">{c.category} (×{c.times_ordered})</span>
-                    )).reduce((acc: any, el, i) => i === 0 ? [el] : [...acc, ', ', el], [])}
-                    .
+                    {categoryStats.map((c, i) => (
+                      <span key={c.category}>{i > 0 && ', '}<span className="font-medium">{c.category} (×{c.times_ordered})</span></span>
+                    ))}.
                   </span>
-                  <button
-                    onClick={() => setShowDebug(d => !d)}
-                    className="ml-2 text-blue-500 hover:text-blue-700 underline text-xs"
-                  >
+                  <button onClick={() => setShowDebug(d => !d)} className="ml-2 text-blue-500 hover:text-blue-700 underline text-xs">
                     {showDebug ? 'hide scores' : 'show scores'}
                   </button>
                 </>
@@ -197,7 +171,6 @@ export default function BrowseProductsPage() {
           </div>
         )}
 
-        {/* ── Loading ── */}
         {loading ? (
           <div className="text-center py-8 text-gray-500">{t('messages.loadingProducts')}</div>
         ) : sorted.length === 0 ? (
@@ -212,6 +185,7 @@ export default function BrowseProductsPage() {
               const score = scoreMap[product.id] ?? 0;
               const reasons = reasonMap[product.id] ?? [];
               const isRecommended = sortMode === 'recommended' && hasHistory && score > 0;
+              const outOfStock = product.quantity === 0;
 
               return (
                 <div
@@ -221,7 +195,7 @@ export default function BrowseProductsPage() {
                   }`}
                   onClick={() => { setSelectedProduct(product); setShowProductDetails(true); }}
                 >
-                  {/* Recommended badge — sits above the image in normal flow */}
+                  {/* Recommended badge */}
                   {isRecommended && (
                     <div className="flex justify-end mb-2">
                       <div className="flex items-center gap-1 bg-blue-600 text-white text-xs px-2 py-0.5 rounded-full">
@@ -231,7 +205,7 @@ export default function BrowseProductsPage() {
                     </div>
                   )}
 
-                  {/* Debug score overlay */}
+                  {/* Debug score */}
                   {showDebug && sortMode === 'recommended' && (
                     <div className="absolute top-3 left-3 bg-black/70 text-white text-xs px-2 py-1 rounded-lg z-10">
                       score: {score}
@@ -258,6 +232,11 @@ export default function BrowseProductsPage() {
                     >
                       <ImageIcon className="w-8 h-8 text-gray-400" />
                     </div>
+                    {outOfStock && (
+                      <div className="absolute inset-0 bg-black/40 rounded-lg flex items-center justify-center">
+                        <span className="bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full">OUT OF STOCK</span>
+                      </div>
+                    )}
                   </div>
 
                   <h3 className="font-semibold text-gray-900 mb-2">{product.name}</h3>
@@ -268,7 +247,6 @@ export default function BrowseProductsPage() {
                     <p>{t('productInfo.stock')}: {product.quantity}kg</p>
                   </div>
 
-                  {/* Recommendation reasons (shown when debug is on) */}
                   {showDebug && reasons.length > 0 && (
                     <div className="mb-2 space-y-0.5">
                       {reasons.map((r, i) => (
@@ -302,15 +280,22 @@ export default function BrowseProductsPage() {
                         value={selectedQuantity[product.id] ?? 1}
                         onChange={e => setSelectedQuantity(prev => ({ ...prev, [product.id]: parseInt(e.target.value) || 1 }))}
                         className="w-16 px-2 py-1 border border-gray-300 rounded text-sm text-center"
+                        disabled={outOfStock}
                       />
                       <span className="text-xs text-gray-700">kg</span>
                     </div>
-                    <button
-                      className="flex-1 px-3 py-2 bg-blue-100 text-blue-700 rounded-lg text-sm hover:bg-blue-200 transition-colors"
-                      onClick={() => addToCart(product.id, selectedQuantity[product.id] ?? 1)}
-                    >
-                      {t('Add to Cart')}
-                    </button>
+                    {outOfStock ? (
+                      <div className="flex-1 px-3 py-2 bg-red-50 text-red-500 rounded-lg text-sm text-center font-medium border border-red-200">
+                        Out of Stock
+                      </div>
+                    ) : (
+                      <button
+                        className="flex-1 px-3 py-2 bg-blue-100 text-blue-700 rounded-lg text-sm hover:bg-blue-200 transition-colors"
+                        onClick={() => addToCart(product.id, selectedQuantity[product.id] ?? 1)}
+                      >
+                        {t('Add to Cart')}
+                      </button>
+                    )}
                   </div>
                 </div>
               );

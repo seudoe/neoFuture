@@ -114,10 +114,12 @@ export default function MyCropsPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
             {filteredProducts.map((product) => (
               <div key={product.id} className="border border-gray-200 rounded-xl p-4 hover:shadow-md transition-shadow cursor-pointer">
                 <div 
                   className="w-full h-32 bg-gray-100 rounded-lg mb-4 flex items-center justify-center relative"
+
                   onClick={() => handleViewProduct(product)}
                 >
                   {product.photos && product.photos.length > 0 ? (
@@ -133,46 +135,54 @@ export default function MyCropsPage() {
                       }}
                     />
                   ) : null}
-                  <div className={`fallback-icon w-full h-full flex items-center justify-center ${product.photos && product.photos.length > 0 ? 'absolute inset-0' : ''}`} style={{ display: product.photos && product.photos.length > 0 ? 'none' : 'flex' }}>
+                  <div
+                    className={`fallback-icon w-full h-full flex items-center justify-center ${product.photos && product.photos.length > 0 ? 'absolute inset-0' : ''}`}
+                    style={{ display: product.photos && product.photos.length > 0 ? 'none' : 'flex' }}
+                  >
                     <ImageIcon className="w-8 h-8 text-gray-400" />
                   </div>
+                  {product.quantity === 0 && (
+                    <div className="absolute inset-0 bg-black bg-opacity-40 rounded-lg flex items-center justify-center">
+                      <span className="bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full">OUT OF STOCK</span>
+                    </div>
+                  )}
                 </div>
-                <div onClick={() => handleViewProduct(product)}>
+
+                <div className="cursor-pointer" onClick={() => handleViewProduct(product)}>
                   <h3 className="font-semibold text-gray-900 mb-2">{product.name}</h3>
                   <div className="space-y-1 text-sm text-gray-600">
                     <p>{t('productInfo.category')}: {product.category}</p>
                     <p>{t('productInfo.singlePrice')}: ₹{product.price_single}/kg</p>
                     {product.price_multiple && <p>{t('productInfo.bulk')}: ₹{product.price_multiple}/kg</p>}
-                    <p>{t('productInfo.stock')}: {product.quantity}kg</p>
+                    <p className={product.quantity === 0 ? 'text-red-600 font-medium' : ''}>
+                      {t('productInfo.stock')}: {product.quantity === 0 ? 'Out of stock' : `${product.quantity}kg`}
+                    </p>
                     <p>{t('productInfo.location')}: {product.location}</p>
                     {product.photos && product.photos.length > 0 && (
                       <p className="text-blue-600">📸 {product.photos.length} {product.photos.length > 1 ? t('productInfo.photosPlural') : t('productInfo.photos')}</p>
                     )}
                   </div>
                 </div>
+
                 <div className="mt-3 flex justify-between items-center">
                   <span className={`px-2 py-1 rounded-full text-xs ${
-                    product.status === 'active' 
-                      ? 'bg-green-100 text-green-800' 
+                    product.quantity === 0
+                      ? 'bg-red-100 text-red-700'
+                      : product.status === 'active'
+                      ? 'bg-green-100 text-green-800'
                       : 'bg-orange-100 text-orange-800'
                   }`}>
-                    {product.status}
+                    {product.quantity === 0 ? 'out of stock' : product.status}
                   </span>
                   <div className="flex gap-2">
-                    <button 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleViewProduct(product);
-                      }}
+                    <button
+                      onClick={(e) => { e.stopPropagation(); handleViewProduct(product); }}
                       className="text-blue-600 hover:text-blue-700 text-sm font-medium px-2 py-1 rounded hover:bg-blue-50 transition-colors"
                     >
                       {t('common.view')}
                     </button>
-                    <button 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleEditProduct(product);
-                      }}
+                    <button
+                      onClick={(e) => { e.stopPropagation(); handleEditProduct(product); }}
                       className="text-green-600 hover:text-green-700 text-sm font-medium px-2 py-1 rounded hover:bg-green-50 transition-colors"
                     >
                       {t('common.edit')}

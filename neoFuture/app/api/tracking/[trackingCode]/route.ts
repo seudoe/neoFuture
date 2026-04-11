@@ -75,13 +75,13 @@ export async function GET(
         totalPrice: order.total_price,
         deliveryAddress: order.delivery_address,
         product: {
-          name: order.product?.name,
-          category: order.product?.category,
-          photo: order.product?.photos?.[0] || null
+          name: (order.product as any)?.name,
+          category: (order.product as any)?.category,
+          photo: (order.product as any)?.photos?.[0] || null
         },
         seller: {
-          name: order.seller?.name,
-          phone: order.seller?.phone_number
+          name: (order.seller as any)?.name,
+          phone: (order.seller as any)?.phone_number
         },
         timeline: trackingLogs || []
       }

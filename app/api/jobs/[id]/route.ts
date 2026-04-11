@@ -7,9 +7,10 @@ const supabase = createClient(
 );
 
 // PUT /api/jobs/[id] — start job / end job early
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const jobId = parseInt(params.id);
+    const { id } = await params;
+    const jobId = parseInt(id);
     const body = await request.json();
     const { action, lister_id } = body;
 
@@ -68,9 +69,10 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 }
 
 // DELETE /api/jobs/[id] — remove job (lister only)
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const jobId = parseInt(params.id);
+    const { id } = await params;
+    const jobId = parseInt(id);
     const { lister_id } = await request.json();
 
     const { data: job } = await supabase

@@ -48,25 +48,34 @@ function isAgricultureRelated(question: string): boolean {
 
 export async function POST(request: NextRequest) {
   try {
-    const { message, conversationHistory = [] } = await request.json();
+    const { message, conversationHistory = [], locale = 'en' } = await request.json();
 
     if (!message) return NextResponse.json({ error: 'Message required' }, { status: 400 });
 
     const apiKey = process.env.GROQ_API_KEY;
 
-    // REVISED VALIDATION LOGIC
-    // We only block it if it's long AND doesn't have keywords. 
-    // This allows short questions like "What is a lemon?" to pass through to the AI.
     const hasAgriKeywords = isAgricultureRelated(message);
     
     if (!hasAgriKeywords && message.split(' ').length > 3) {
-      return NextResponse.json({
-        response: "I apologize, but I can only assist with agriculture and farming-related questions. Please ask me about crops, livestock, soil management, pest control, irrigation, or other farming topics."
-      });
+      const offTopicMsg = locale === 'hi'
+        ? 'मैं केवल कृषि और खेती से संबंधित प्रश्नों में सहायता कर सकता हूँ। कृपया फसल, पशुधन, मिट्टी, या खेती के बारे में पूछें।'
+        : 'I apologize, but I can only assist with agriculture and farming-related questions. Please ask me about crops, livestock, soil management, pest control, irrigation, or other farming topics.';
+      return NextResponse.json({ response: offTopicMsg });
     }
 
+    // Build language-aware system prompt
+    const langInstruction = locale === 'hi'
+      ? 'The user is speaking in Hindi. Always respond in Hindi (Devanagari script). Be clear and simple.'
+      : locale === 'mr'
+      ? 'The user is speaking in Marathi. Always respond in Marathi (Devanagari script).'
+      : locale === 'te'
+      ? 'The user is speaking in Telugu. Always respond in Telugu script.'
+      : 'Respond in English.';
+
+    const fullSystemPrompt = `${SYSTEM_PROMPT}\n\nLANGUAGE INSTRUCTION: ${langInstruction} If the user writes in Hindi/regional language, respond in the same language. If in English, respond in English.`;
+
     const messages: ChatMessage[] = [
-      { role: 'system', content: SYSTEM_PROMPT },
+      { role: 'system', content: fullSystemPrompt },
       ...conversationHistory,
       { role: 'user', content: message }
     ];

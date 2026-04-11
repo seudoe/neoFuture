@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { MessageCircle, X, Send, Mic, MicOff, Loader2 } from 'lucide-react';
+import { useI18n } from '@/lib/i18n/context';
 import toast from 'react-hot-toast';
 
 interface ChatMessage {
@@ -89,6 +90,18 @@ const parseBoldText = (text: string) => {
 };
 
 export default function Chatbot({ isOpen, onClose }: ChatbotProps) {
+  const { locale } = useI18n();
+
+  // Map locale to speech recognition language
+  const speechLang = locale === 'hi' ? 'hi-IN'
+    : locale === 'mr' ? 'mr-IN'
+    : locale === 'te' ? 'te-IN'
+    : 'en-IN';
+
+  const listeningLabel = locale === 'hi' ? 'सुन रहा हूँ... बोलें'
+    : locale === 'mr' ? 'ऐकत आहे...'
+    : locale === 'te' ? 'వింటున్నాను...'
+    : 'Listening... Speak now';
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       role: 'assistant',
@@ -116,7 +129,7 @@ How can I help you today?`,
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Initialize speech recognition
+  // Initialize speech recognition - re-create when language changes
   useEffect(() => {
     if (typeof window !== 'undefined' && ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -124,7 +137,7 @@ How can I help you today?`,
       
       recognitionInstance.continuous = false;
       recognitionInstance.interimResults = false;
-      recognitionInstance.lang = 'en-IN'; // Indian English
+      recognitionInstance.lang = speechLang;
       
       recognitionInstance.onresult = (event) => {
         const transcript = event.results[0][0].transcript;
@@ -133,8 +146,7 @@ How can I help you today?`,
       };
       
       recognitionInstance.onerror = (event) => {
-        // "network" error on HTTP is a Chrome quirk - ignore silently
-        if (event.error === 'network') {
+        if (event.error === 'network' || event.error === 'no-speech') {
           setIsListening(false);
           return;
         }
@@ -148,7 +160,7 @@ How can I help you today?`,
       
       setRecognition(recognitionInstance);
     }
-  }, []);
+  }, [speechLang]); // re-init when language changes
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -183,10 +195,11 @@ How can I help you today?`,
         },
         body: JSON.stringify({
           message: userMessage.content,
+          locale,
           conversationHistory: messages.slice(-8).map(msg => ({
             role: msg.role,
             content: msg.content
-          })) // Keep only last 8 messages for context
+          }))
         })
       });
 
@@ -407,7 +420,7 @@ How can I help you today?`,
             <div className="mt-2 flex items-center justify-center">
               <div className="flex items-center space-x-2 text-red-600 text-sm">
                 <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse" />
-                <span>Listening... Speak now</span>
+                <span>{listeningLabel}</span>
               </div>
             </div>
           )}

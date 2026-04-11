@@ -23,7 +23,6 @@ export function useVoiceRecognition({
     if (typeof window === 'undefined') return;
     const supported = 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window;
     setIsSupported(supported);
-
     if (!supported) return;
 
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -39,14 +38,11 @@ export function useVoiceRecognition({
     };
 
     recognition.onerror = (event) => {
-      // "network" error on HTTP is a Chrome quirk - ignore silently
-      if (event.error === 'network') {
+      if (event.error === 'network' || event.error === 'no-speech') {
         setIsListening(false);
         return;
       }
-      const msg = event.error === 'no-speech'
-        ? 'No speech detected. Try again.'
-        : event.error === 'not-allowed'
+      const msg = event.error === 'not-allowed'
         ? 'Microphone permission denied.'
         : `Error: ${event.error}`;
       onError?.(msg);
@@ -57,9 +53,8 @@ export function useVoiceRecognition({
 
     recognitionRef.current = recognition;
 
-    return () => {
-      recognition.abort();
-    };
+    return () => { recognition.abort(); };
+  // Re-create recognition when lang changes
   }, [lang, continuous]);
 
   const start = useCallback(() => {
@@ -67,9 +62,7 @@ export function useVoiceRecognition({
     try {
       recognitionRef.current.start();
       setIsListening(true);
-    } catch {
-      setIsListening(false);
-    }
+    } catch { setIsListening(false); }
   }, [isListening]);
 
   const stop = useCallback(() => {

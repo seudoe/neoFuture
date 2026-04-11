@@ -68,7 +68,7 @@ export default function FarmerLayout({ children }: { children: React.ReactNode }
               <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center">
                 <Sprout className="w-5 h-5 text-white" />
               </div>
-              <h1 className="ml-3 text-xl font-semibold text-gray-900">AgriBridge</h1>
+              <h1 className="ml-3 text-xl font-semibold text-gray-900">AgriLink</h1>
               <span className="ml-2 px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">{t('auth.farmer')}</span>
             </div>
             <div className="flex items-center space-x-4">

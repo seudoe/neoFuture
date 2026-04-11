@@ -153,7 +153,7 @@ export default function PWATestPage() {
             <ol className="text-sm text-blue-800 space-y-1 list-decimal list-inside">
               <li>Open this app in Chrome, Edge, or Safari on mobile/desktop</li>
               <li>Look for an "Install" button in the address bar or browser menu</li>
-              <li>Click install to add AgriBridge to your home screen/desktop</li>
+              <li>Click install to add AgriLink to your home screen/desktop</li>
               <li>The app will open in standalone mode without browser UI</li>
               <li>Test offline functionality by turning off your internet connection</li>
             </ol>
@@ -164,7 +164,7 @@ export default function PWATestPage() {
               href="/" 
               className="inline-block bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors"
             >
-              Back to AgriBridge
+              Back to AgriLink
             </a>
           </div>
         </div>

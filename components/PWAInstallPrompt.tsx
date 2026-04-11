@@ -53,7 +53,7 @@ export default function PWAInstallPrompt() {
     <div className="fixed bottom-4 left-4 right-4 bg-green-600 text-white p-4 rounded-lg shadow-lg z-50 md:left-auto md:right-4 md:max-w-sm">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="font-semibold text-sm">Install AgriBridge</h3>
+          <h3 className="font-semibold text-sm">Install AgriLink</h3>
           <p className="text-xs opacity-90">Get quick access from your home screen</p>
         </div>
         <div className="flex gap-2 ml-4">

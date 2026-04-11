@@ -17,20 +17,20 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AgriBridge - Digital Marketplace for Farmers",
+  title: "AgriLink - Digital Marketplace for Farmers",
   description: "Connecting farmers directly with buyers, retailers, and consumers",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "AgriBridge",
+    title: "AgriLink",
   },
   other: {
     'mobile-web-app-capable': 'yes',
     'apple-mobile-web-app-capable': 'yes',
     'apple-mobile-web-app-status-bar-style': 'default',
-    'apple-mobile-web-app-title': 'AgriBridge',
-    'application-name': 'AgriBridge',
+    'apple-mobile-web-app-title': 'AgriLink',
+    'application-name': 'AgriLink',
     'msapplication-TileColor': '#16a34a',
     'msapplication-config': '/browserconfig.xml',
   },

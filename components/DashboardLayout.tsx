@@ -52,7 +52,7 @@ export default function DashboardLayout({
                 <div className={`w-8 h-8 bg-${accentColor}-600 rounded-full flex items-center justify-center`}>
                   <Sprout className="w-5 h-5 text-white" />
                 </div>
-                <h1 className="ml-3 text-xl font-semibold text-gray-900">AgriBridge</h1>
+                <h1 className="ml-3 text-xl font-semibold text-gray-900">AgriLink</h1>
                 <span className={`ml-2 px-2 py-1 ${badgeColor} text-xs rounded-full capitalize`}>
                   {userType}
                 </span>
@@ -79,7 +79,7 @@ export default function DashboardLayout({
                 <div className={`w-8 h-8 bg-${accentColor}-600 rounded-full flex items-center justify-center`}>
                   <Sprout className="w-5 h-5 text-white" />
                 </div>
-                <h1 className="ml-3 text-xl font-semibold text-gray-900">AgriBridge</h1>
+                <h1 className="ml-3 text-xl font-semibold text-gray-900">AgriLink</h1>
                 <span className={`ml-2 px-2 py-1 ${badgeColor} text-xs rounded-full capitalize`}>
                   {userType}
                 </span>

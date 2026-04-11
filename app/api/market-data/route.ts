@@ -272,7 +272,7 @@ export async function GET(request: NextRequest) {
           signal: controller.signal,
           headers: {
             'Accept': 'application/json',
-            'User-Agent': 'AgriBridge-PricePrediction/1.0'
+            'User-Agent': 'AgriLink-PricePrediction/1.0'
           }
         });
 

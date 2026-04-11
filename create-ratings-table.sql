@@ -1,4 +1,4 @@
--- Create ratings table for AgriBridge platform
+-- Create ratings table for AgriLink platform
 -- Run this SQL in your Supabase SQL Editor
 
 -- Create the ratings table

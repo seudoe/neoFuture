@@ -216,7 +216,7 @@ export default function PaymentPortal({
                     name="fullName"
                     value={formData.fullName}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900"
                     required
                   />
                 </div>
@@ -230,7 +230,7 @@ export default function PaymentPortal({
                     name="email"
                     value={formData.email}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900"
                     required
                   />
                 </div>
@@ -246,7 +246,7 @@ export default function PaymentPortal({
                   name="phone"
                   value={formData.phone}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900"
                   required
                 />
               </div>
@@ -261,7 +261,7 @@ export default function PaymentPortal({
                   value={formData.address}
                   onChange={handleInputChange}
                   rows={3}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none text-gray-900 placeholder-gray-400"
                   placeholder="House/Flat No, Street, Area"
                   required
                 />
@@ -280,7 +280,7 @@ export default function PaymentPortal({
                     value={formData.city}
                     onChange={handleInputChange}
                     placeholder={locationLoading ? 'Detecting...' : 'City'}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 placeholder-gray-400"
                     required
                   />
                 </div>
@@ -296,7 +296,7 @@ export default function PaymentPortal({
                     value={formData.pincode}
                     onChange={handleInputChange}
                     placeholder={locationLoading ? 'Detecting...' : 'PIN Code'}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 placeholder-gray-400"
                     required
                   />
                 </div>
@@ -309,7 +309,7 @@ export default function PaymentPortal({
                   value={formData.notes}
                   onChange={handleInputChange}
                   rows={2}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none text-gray-900 placeholder-gray-400"
                   placeholder="Any special delivery instructions..."
                 />
               </div>
@@ -319,21 +319,21 @@ export default function PaymentPortal({
                 <h3 className="font-semibold text-gray-900 mb-3">Order Summary</h3>
                 <div className="space-y-2">
                   {cartItems.map(item => (
-                    <div key={item.id} className="flex justify-between text-sm">
+                    <div key={item.id} className="flex justify-between text-sm text-gray-900">
                       <span>{item.name} × {item.cart_quantity}kg</span>
                       <span>₹{calculateItemTotal(item)}</span>
                     </div>
                   ))}
                   <div className="border-t pt-2 mt-2">
-                    <div className="flex justify-between text-sm">
+                    <div className="flex justify-between text-sm text-gray-900">
                       <span>Subtotal</span>
                       <span>₹{subtotal}</span>
                     </div>
-                    <div className="flex justify-between text-sm">
+                    <div className="flex justify-between text-sm text-gray-900">
                       <span>Delivery Fee</span>
                       <span>₹{deliveryFee}</span>
                     </div>
-                    <div className="flex justify-between font-semibold text-lg border-t pt-2 mt-2">
+                    <div className="flex justify-between font-semibold text-lg border-t pt-2 mt-2 text-gray-900">
                       <span>Total</span>
                       <span>₹{total}</span>
                     </div>
@@ -356,39 +356,21 @@ export default function PaymentPortal({
               <div className="bg-gray-50 rounded-xl p-4">
                 <h3 className="font-semibold text-gray-900 mb-2">Payment Method</h3>
                 <div className="space-y-3">
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      value="card"
-                      checked={formData.paymentMethod === 'card'}
-                      onChange={handleInputChange}
-                      className="mr-3"
-                    />
+                  <label className="flex items-center text-gray-900">
+                    <input type="radio" name="paymentMethod" value="card"
+                      checked={formData.paymentMethod === 'card'} onChange={handleInputChange} className="mr-3" />
                     <CreditCard className="w-5 h-5 mr-2" />
                     Credit/Debit Card
                   </label>
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      value="upi"
-                      checked={formData.paymentMethod === 'upi'}
-                      onChange={handleInputChange}
-                      className="mr-3"
-                    />
+                  <label className="flex items-center text-gray-900">
+                    <input type="radio" name="paymentMethod" value="upi"
+                      checked={formData.paymentMethod === 'upi'} onChange={handleInputChange} className="mr-3" />
                     <span className="w-5 h-5 mr-2 text-center">💳</span>
                     UPI Payment
                   </label>
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      value="cod"
-                      checked={formData.paymentMethod === 'cod'}
-                      onChange={handleInputChange}
-                      className="mr-3"
-                    />
+                  <label className="flex items-center text-gray-900">
+                    <input type="radio" name="paymentMethod" value="cod"
+                      checked={formData.paymentMethod === 'cod'} onChange={handleInputChange} className="mr-3" />
                     <span className="w-5 h-5 mr-2 text-center">💰</span>
                     Cash on Delivery
                   </label>

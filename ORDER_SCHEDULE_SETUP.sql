@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS order_schedules (
     buyer_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     product_name VARCHAR(255) NOT NULL,
     quantity INTEGER NOT NULL CHECK (quantity > 0),
-    allow_multiple_farmers BOOLEAN DEFAULT FALSE,
+    allow_multiple_farmers BOOLEAN DEFAULT FALSE,--
     description TEXT DEFAULT '',
     max_price_per_unit DECIMAL(10,2) DEFAULT NULL,
     schedule_type VARCHAR(20) NOT NULL CHECK (schedule_type IN ('monthly', 'weekly', 'daily')),

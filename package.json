@@ -9,6 +9,9 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@capacitor/android": "^8.3.0",
+    "@capacitor/cli": "^8.3.0",
+    "@capacitor/core": "^8.3.0",
     "@supabase/supabase-js": "^2.93.3",
     "@types/bcryptjs": "^2.4.6",
     "@types/pg": "^8.16.0",

@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS jobs (
   end_time TIME NOT NULL,
   workers_required INTEGER NOT NULL DEFAULT 1,
   workers_accepted INTEGER NOT NULL DEFAULT 0,
-  fixed_pay NUMERIC(10,2) NOT NULL,
+  fixed_pay NUMERIC(10,2) NOT NULL,--
   tools_required TEXT,
   tools_provided BOOLEAN NOT NULL DEFAULT false,
   registration_deadline DATE NOT NULL,

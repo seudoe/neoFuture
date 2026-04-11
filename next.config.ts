@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
     root: process.cwd(),
   },
 };
-
+//
 export default withPWA({
   dest: 'public',
   register: true,

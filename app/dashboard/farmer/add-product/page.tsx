@@ -337,6 +337,19 @@ export default function AddProductPage() {
               <ImageIcon className="w-4 h-4 inline mr-1" />
               {t('forms.productPhotos')}
             </label>
+
+            {/* Photo advice */}
+            <div className="flex items-start gap-3 mb-3 p-3 bg-amber-50 border border-amber-200 rounded-xl">
+              <span className="text-xl shrink-0">📸</span>
+              <div>
+                <p className="text-sm font-medium text-amber-900">Better photos = more buyers</p>
+                <p className="text-xs text-amber-700 mt-0.5 leading-relaxed">
+                  Take photos from <span className="font-medium">all sides</span> — front, back, close-up, and a full view.
+                  Show the <span className="font-medium">colour, size, and freshness</span> clearly so buyers feel confident ordering.
+                </p>
+              </div>
+            </div>
+
             <PhotoUpload
               onPhotosChange={setSelectedPhotos}
               userId={user?.id}

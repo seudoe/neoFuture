@@ -14,6 +14,7 @@ if ($adapters.Count -eq 0) {
     Write-Host "   Make sure you're connected to WiFi or Ethernet`n" -ForegroundColor Yellow
     exit
 }
+# new
 
 Write-Host "✅ Found your IP addresses:`n" -ForegroundColor Green
 

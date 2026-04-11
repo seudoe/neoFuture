@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS public.ratings (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   CONSTRAINT unique_order_rater UNIQUE(order_id, rater_id)
-);
+); --
 
 -- Create indexes for better performance
 CREATE INDEX IF NOT EXISTS idx_ratings_order_id ON public.ratings(order_id);

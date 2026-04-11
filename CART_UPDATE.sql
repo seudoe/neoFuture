@@ -1,5 +1,6 @@
 -- Update cart table to store product quantities
 -- Drop the old table and recreate with new structure
+-- Last reviewed: April 2026
 DROP TABLE IF EXISTS cart;
 
 CREATE TABLE cart (
@@ -9,8 +10,8 @@ CREATE TABLE cart (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   UNIQUE(user_id)
-);
-
+);  --  cart
+ 
 -- Create index for faster queries
 CREATE INDEX idx_cart_user_id ON cart(user_id);
 CREATE INDEX idx_cart_items ON cart USING GIN (items);

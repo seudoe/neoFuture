@@ -6,7 +6,7 @@ CREATE TABLE cart (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   UNIQUE(user_id)
-);
+); -- cart
 
 -- Create index for faster queries
 CREATE INDEX idx_cart_user_id ON cart(user_id);

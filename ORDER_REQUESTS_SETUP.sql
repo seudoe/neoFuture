@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS order_requests (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
-
+--
 -- Create order_applications table
 CREATE TABLE IF NOT EXISTS order_applications (
     id SERIAL PRIMARY KEY,

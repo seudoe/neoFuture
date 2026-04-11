@@ -14,6 +14,7 @@ import {
   Star
 } from 'lucide-react';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
+import VoiceAssistant from '@/components/VoiceAssistant';
 import { useDashboardData, useProducts, useRatings } from '@/lib/hooks/useDashboardData';
 
 export default function BuyerLayout({ children }: { children: React.ReactNode }) {
@@ -210,6 +211,7 @@ export default function BuyerLayout({ children }: { children: React.ReactNode })
           <div className="flex-1">{children}</div>
         </div>
       </div>
+      <VoiceAssistant role="buyer" />
     </div>
   );
 }

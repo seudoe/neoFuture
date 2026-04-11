@@ -135,6 +135,10 @@ How can I help you today?`,
       recognitionInstance.onerror = (event) => {
         console.error('Speech recognition error:', event.error);
         setIsListening(false);
+        
+        // "network" error usually means HTTP instead of HTTPS
+        // Silently ignore it on localhost/dev - it still works for most cases
+        if (event.error === 'network') return;
       };
       
       recognitionInstance.onend = () => {

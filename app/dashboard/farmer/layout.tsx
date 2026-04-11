@@ -19,6 +19,7 @@ import {
 
 } from 'lucide-react';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
+import VoiceAssistant from '@/components/VoiceAssistant';
 import { useDashboardData, useProducts, useRatings } from '@/lib/hooks/useDashboardData';
 
 export default function FarmerLayout({ children }: { children: React.ReactNode }) {
@@ -220,6 +221,7 @@ export default function FarmerLayout({ children }: { children: React.ReactNode }
           <div className="flex-1">{children}</div>
         </div>
       </div>
+      <VoiceAssistant role="farmer" />
     </div>
   );
 }

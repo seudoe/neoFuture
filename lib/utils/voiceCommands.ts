@@ -1,7 +1,8 @@
 export interface VoiceCommand {
   keywords: string[];
   hindiKeywords?: string[];
-  route: (role: 'buyer' | 'farmer') => string;
+  // Returns null if the command is not valid for the given role
+  route: (role: 'buyer' | 'farmer') => string | null;
   label: string;
   labelHi: string;
 }
@@ -22,27 +23,6 @@ const COMMANDS: VoiceCommand[] = [
     labelHi: 'मेरे ऑर्डर',
   },
   {
-    keywords: ['browse', 'products', 'shop', 'buy', 'market'],
-    hindiKeywords: ['उत्पाद', 'खरीदें', 'बाजार', 'ब्राउज़'],
-    route: () => '/dashboard/buyer/browse',
-    label: 'Browse Products',
-    labelHi: 'उत्पाद देखें',
-  },
-  {
-    keywords: ['cart', 'basket', 'checkout'],
-    hindiKeywords: ['कार्ट', 'टोकरी', 'चेकआउट'],
-    route: () => '/dashboard/buyer/cart',
-    label: 'Cart',
-    labelHi: 'कार्ट',
-  },
-  {
-    keywords: ['suppliers', 'farmers', 'seller'],
-    hindiKeywords: ['आपूर्तिकर्ता', 'किसान', 'विक्रेता'],
-    route: () => '/dashboard/buyer/suppliers',
-    label: 'Suppliers',
-    labelHi: 'आपूर्तिकर्ता',
-  },
-  {
     keywords: ['profile', 'account', 'settings'],
     hindiKeywords: ['प्रोफाइल', 'खाता', 'सेटिंग'],
     route: (role) => `/dashboard/${role}/profile`,
@@ -50,46 +30,85 @@ const COMMANDS: VoiceCommand[] = [
     labelHi: 'प्रोफाइल',
   },
   {
+    keywords: ['order requests', 'requests', 'bulk order'],
+    hindiKeywords: ['ऑर्डर अनुरोध', 'अनुरोध', 'बल्क ऑर्डर'],
+    route: (role) => `/dashboard/${role}/order-requests`,
+    label: 'Order Requests',
+    labelHi: 'ऑर्डर अनुरोध',
+  },
+
+  // ── Buyer-only ────────────────────────────────────────────────────────────
+  {
+    keywords: ['browse', 'products', 'shop', 'buy', 'market'],
+    hindiKeywords: ['उत्पाद', 'खरीदें', 'बाजार', 'ब्राउज़'],
+    route: (role) => role === 'buyer' ? '/dashboard/buyer/browse' : null,
+    label: 'Browse Products',
+    labelHi: 'उत्पाद देखें',
+  },
+  {
+    keywords: ['cart', 'basket', 'checkout'],
+    hindiKeywords: ['कार्ट', 'टोकरी', 'चेकआउट'],
+    route: (role) => role === 'buyer' ? '/dashboard/buyer/cart' : null,
+    label: 'Cart',
+    labelHi: 'कार्ट',
+  },
+  {
+    keywords: ['suppliers', 'seller'],
+    hindiKeywords: ['आपूर्तिकर्ता', 'विक्रेता'],
+    route: (role) => role === 'buyer' ? '/dashboard/buyer/suppliers' : null,
+    label: 'Suppliers',
+    labelHi: 'आपूर्तिकर्ता',
+  },
+
+  // ── Farmer-only ───────────────────────────────────────────────────────────
+  {
     keywords: ['jobs', 'work', 'labour', 'labor'],
     hindiKeywords: ['नौकरी', 'काम', 'मजदूर', 'रोजगार'],
-    route: () => '/dashboard/farmer/jobs',
+    route: (role) => role === 'farmer' ? '/dashboard/farmer/jobs' : null,
     label: 'Jobs',
     labelHi: 'नौकरी',
   },
   {
     keywords: ['crops', 'my crops', 'listings'],
     hindiKeywords: ['फसल', 'मेरी फसल', 'लिस्टिंग'],
-    route: () => '/dashboard/farmer/my-crops',
+    route: (role) => role === 'farmer' ? '/dashboard/farmer/my-crops' : null,
     label: 'My Crops',
     labelHi: 'मेरी फसल',
   },
   {
     keywords: ['add product', 'add crop', 'new product', 'list product'],
     hindiKeywords: ['उत्पाद जोड़ें', 'फसल जोड़ें', 'नया उत्पाद'],
-    route: () => '/dashboard/farmer/add-product',
+    route: (role) => role === 'farmer' ? '/dashboard/farmer/add-product' : null,
     label: 'Add Product',
     labelHi: 'उत्पाद जोड़ें',
   },
   {
     keywords: ['subsidies', 'schemes', 'government', 'support'],
     hindiKeywords: ['सब्सिडी', 'योजना', 'सरकार', 'सहायता'],
-    route: () => '/dashboard/farmer/subsidies',
+    route: (role) => role === 'farmer' ? '/dashboard/farmer/subsidies' : null,
     label: 'Subsidies',
     labelHi: 'सब्सिडी',
   },
   {
     keywords: ['skills', 'training', 'learn', 'education'],
     hindiKeywords: ['कौशल', 'प्रशिक्षण', 'सीखें', 'शिक्षा'],
-    route: () => '/dashboard/farmer/skill-development',
+    route: (role) => role === 'farmer' ? '/dashboard/farmer/skill-development' : null,
     label: 'Skill Development',
     labelHi: 'कौशल विकास',
   },
   {
-    keywords: ['order requests', 'requests', 'bulk order'],
-    hindiKeywords: ['ऑर्डर अनुरोध', 'अनुरोध', 'बल्क ऑर्डर'],
-    route: (role) => `/dashboard/${role}/order-requests`,
-    label: 'Order Requests',
-    labelHi: 'ऑर्डर अनुरोध',
+    keywords: ['reviews', 'ratings', 'feedback'],
+    hindiKeywords: ['समीक्षा', 'रेटिंग', 'प्रतिक्रिया'],
+    route: (role) => role === 'farmer' ? '/dashboard/farmer/reviews' : null,
+    label: 'Reviews',
+    labelHi: 'समीक्षाएं',
+  },
+  {
+    keywords: ['farmers', 'find farmers'],
+    hindiKeywords: ['किसान', 'किसान खोजें'],
+    route: (role) => role === 'buyer' ? '/dashboard/buyer/suppliers' : null,
+    label: 'Find Farmers',
+    labelHi: 'किसान खोजें',
   },
 ];
 
@@ -104,7 +123,10 @@ export function parseVoiceCommand(
     const matchHi = cmd.hindiKeywords?.some((kw) => transcript.includes(kw));
 
     if (matchEn || matchHi) {
-      return { route: cmd.route(role), label: cmd.label };
+      const route = cmd.route(role);
+      // null means this command is not available for this role — skip it
+      if (!route) return null;
+      return { route, label: cmd.label };
     }
   }
 

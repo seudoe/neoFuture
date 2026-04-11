@@ -56,7 +56,7 @@ export default function VoiceAssistant({ role }: VoiceAssistantProps) {
         }, 800);
       } else {
         setStatus('error');
-        speak('Command not recognized. Try saying dashboard, orders, or profile.', locale);
+        speak('Command not recognized or not available for your role.', locale);
         toast.error(`"${text}" — not recognized`, { icon: '🎤' });
         setTimeout(() => { setStatus('idle'); setTranscript(''); }, 2500);
       }

@@ -11,7 +11,7 @@ async function setupRatings() {
                 'Content-Type': 'application/json'
             }
         });
-
+// rating
         const result = await response.json();
 
         if (result.success) {

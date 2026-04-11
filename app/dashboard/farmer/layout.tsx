@@ -3,20 +3,9 @@
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useI18n } from '@/lib/i18n/context';
-import { 
-  BarChart3, 
-  Wheat, 
-  Package, 
-  User, 
-  Plus,
-  Star,
-  Award,
-  ClipboardList,
-  Sprout,
-  GraduationCap,
-
-  Briefcase
-
+import {
+  BarChart3, Wheat, Package, User, Plus, Star, Award,
+  ClipboardList, Sprout, GraduationCap, Briefcase, Menu, X
 } from 'lucide-react';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import VoiceAssistant from '@/components/VoiceAssistant';
@@ -29,12 +18,14 @@ export default function FarmerLayout({ children }: { children: React.ReactNode }
   const { user, loading } = useDashboardData('seller');
   const { products } = useProducts(user?.id);
   const { userStats } = useRatings(user?.id, 'seller');
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
-    if (!loading && !user) {
-      router.replace('/login');
-    }
+    if (!loading && !user) router.replace('/login');
   }, [user, loading, router]);
+
+  // Close menu on route change
+  useEffect(() => { setMenuOpen(false); }, [pathname]);
 
   if (loading || !user) {
     return (
@@ -45,106 +36,112 @@ export default function FarmerLayout({ children }: { children: React.ReactNode }
   }
 
   const tabs = [
-    { id: 'overview', name: t('navigation.dashboard'), icon: BarChart3, path: '/dashboard/farmer/overview' },
-    { id: 'my-crops', name: t('farmer.myCrops'), icon: Wheat, path: '/dashboard/farmer/my-crops' },
-    { id: 'add-product', name: t('farmer.addProduct'), icon: Plus, path: '/dashboard/farmer/add-product' },
-    { id: 'order-requests', name: t('navigation.orderRequests'), icon: ClipboardList, path: '/dashboard/farmer/order-requests' },
-    { id: 'orders', name: t('navigation.myOrders'), icon: Package, path: '/dashboard/farmer/orders' },
-    { id: 'reviews', name: t('farmer.receivedReviews'), icon: Star, path: '/dashboard/farmer/reviews' },
-    { id: 'subsidies', name: t('subsidies.title'), icon: Award, path: '/dashboard/farmer/subsidies' },
-    { id: 'skill-development', name: t('skillDevelopment.title'), icon: GraduationCap, path: '/dashboard/farmer/skill-development' },
-    { id: 'jobs', name: t('dashboard.farmJobs'), icon: Briefcase, path: '/dashboard/farmer/jobs' },
-    { id: 'profile', name: t('navigation.profile'), icon: User, path: '/dashboard/farmer/profile' },
+    { id: 'overview',         name: t('navigation.dashboard'),    icon: BarChart3,    path: '/dashboard/farmer/overview' },
+    { id: 'my-crops',         name: t('farmer.myCrops'),          icon: Wheat,        path: '/dashboard/farmer/my-crops' },
+    { id: 'add-product',      name: t('farmer.addProduct'),       icon: Plus,         path: '/dashboard/farmer/add-product' },
+    { id: 'order-requests',   name: t('navigation.orderRequests'),icon: ClipboardList,path: '/dashboard/farmer/order-requests' },
+    { id: 'orders',           name: t('navigation.myOrders'),     icon: Package,      path: '/dashboard/farmer/orders' },
+    { id: 'reviews',          name: t('farmer.receivedReviews'),  icon: Star,         path: '/dashboard/farmer/reviews' },
+    { id: 'subsidies',        name: t('subsidies.title'),         icon: Award,        path: '/dashboard/farmer/subsidies' },
+    { id: 'skill-development',name: t('skillDevelopment.title'),  icon: GraduationCap,path: '/dashboard/farmer/skill-development' },
+    { id: 'jobs',             name: t('dashboard.farmJobs'),      icon: Briefcase,    path: '/dashboard/farmer/jobs' },
+    { id: 'profile',          name: t('navigation.profile'),      icon: User,         path: '/dashboard/farmer/profile' },
   ];
+
+  const activeTab = tabs.find(t => t.path === pathname);
 
   const handleLogout = () => {
     localStorage.removeItem('user');
     router.push('/');
   };
 
+  const isOverview = pathname === '/dashboard/farmer/overview';
+
   return (
     <div className="min-h-screen bg-green-50">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-green-100">
+      <header className="bg-white shadow-sm border-b border-green-100 sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Desktop Header */}
+          {/* Desktop */}
           <div className="hidden md:flex justify-between items-center h-16">
             <div className="flex items-center">
-              <div className="flex items-center">
-                <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center">
-                  <Sprout className="w-5 h-5 text-white" />
-                </div>
-                <h1 className="ml-3 text-xl font-semibold text-gray-900">AgriBridge</h1>
-                <span className="ml-2 px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">{t('auth.farmer')}</span>
+              <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center">
+                <Sprout className="w-5 h-5 text-white" />
               </div>
+              <h1 className="ml-3 text-xl font-semibold text-gray-900">AgriBridge</h1>
+              <span className="ml-2 px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">{t('auth.farmer')}</span>
             </div>
             <div className="flex items-center space-x-4">
               <LanguageSwitcher />
               <span className="text-sm text-gray-600">{t('farmer.welcome')}, {user.name}</span>
-              <button onClick={handleLogout} className="text-sm text-white hover:text-gray-700 px-4 py-1 bg-red-400 rounded-lg">
+              <button onClick={handleLogout} className="text-sm text-white px-4 py-1 bg-red-400 rounded-lg hover:bg-red-500">
                 {t('auth.logout')}
               </button>
             </div>
           </div>
 
-          {/* Mobile Header */}
-          <div className="md:hidden py-3">
-            <div className="flex justify-between items-center mb-2">
-              <div className="flex items-center">
-                <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center">
-                  <Sprout className="w-5 h-5 text-white" />
-                </div>
-                <h1 className="ml-3 text-xl font-semibold text-gray-900">AgriBridge</h1>
-                <span className="ml-2 px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">{t('auth.farmer')}</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <LanguageSwitcher />
-                <button onClick={handleLogout} className="text-sm text-white hover:text-gray-700 px-4 py-1 bg-red-400 rounded-lg">
-                  {t('auth.logout')}
-                </button>
-              </div>
+          {/* Mobile */}
+          <div className="md:hidden flex items-center justify-between h-14">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setMenuOpen(o => !o)}
+                className="p-2 rounded-lg text-gray-600 hover:bg-green-50 transition-colors"
+                aria-label="Toggle menu"
+              >
+                {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              </button>
+              {activeTab && (
+                <span className="text-sm font-semibold text-gray-800">{activeTab.name}</span>
+              )}
             </div>
-            <div className="text-center">
-              <span className="text-sm text-gray-600">{t('farmer.welcome')}, {user.name}</span>
-            </div>
+            <LanguageSwitcher />
           </div>
         </div>
-      </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 lg:py-8">
-        <div className="flex flex-col lg:flex-row gap-4 lg:gap-8">
-          {/* Mobile Tab Navigation */}
-          <div className="lg:hidden">
-            <div className="bg-white rounded-xl shadow-sm p-2 mb-4">
-              <div className="flex overflow-x-auto space-x-2 pb-2">
+        {/* Mobile slide-down menu */}
+        {menuOpen && (
+          <div className="md:hidden border-t border-green-100 bg-white shadow-lg">
+            <div className="max-w-7xl mx-auto px-4 py-3">
+              <div className="grid grid-cols-2 gap-1 mb-3">
                 {tabs.map((tab) => {
-                  const IconComponent = tab.icon;
+                  const Icon = tab.icon;
                   const isActive = pathname === tab.path;
                   return (
                     <button
                       key={tab.id}
                       onClick={() => router.push(tab.path)}
-                      className={`flex-shrink-0 flex items-center px-3 py-2 rounded-lg transition-all text-sm ${
+                      className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm transition-colors text-left ${
                         isActive
-                          ? 'bg-green-100 text-green-700'
+                          ? 'bg-green-100 text-green-700 font-medium'
                           : 'text-gray-600 hover:bg-gray-50'
                       }`}
                     >
-                      <IconComponent className="w-4 h-4 mr-2" />
-                      <span className="font-medium whitespace-nowrap">{tab.name}</span>
+                      <Icon className="w-4 h-4 shrink-0" />
+                      <span className="truncate">{tab.name}</span>
                     </button>
                   );
                 })}
               </div>
+              <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+                <span className="text-sm text-gray-600">{user.name}</span>
+                <button onClick={handleLogout} className="text-sm text-white px-4 py-1.5 bg-red-400 rounded-lg hover:bg-red-500">
+                  {t('auth.logout')}
+                </button>
+              </div>
             </div>
           </div>
+        )}
+      </header>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 lg:py-8">
+        <div className="flex flex-col lg:flex-row gap-4 lg:gap-8">
 
           {/* Desktop Sidebar */}
           <div className="hidden lg:block lg:w-64">
             <nav className="bg-white rounded-2xl shadow-sm p-4">
               <div className="space-y-2">
                 {tabs.map((tab) => {
-                  const IconComponent = tab.icon;
+                  const Icon = tab.icon;
                   const isActive = pathname === tab.path;
                   return (
                     <button
@@ -156,7 +153,7 @@ export default function FarmerLayout({ children }: { children: React.ReactNode }
                           : 'text-gray-600 hover:bg-gray-50'
                       }`}
                     >
-                      <IconComponent className="w-5 h-5 mr-3" />
+                      <tab.icon className="w-5 h-5 mr-3" />
                       <span className="font-medium">{tab.name}</span>
                     </button>
                   );
@@ -164,7 +161,6 @@ export default function FarmerLayout({ children }: { children: React.ReactNode }
               </div>
             </nav>
 
-            {/* Quick Stats */}
             <div className="mt-6 bg-white rounded-2xl shadow-sm p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('dashboard.quickStats')}</h3>
               <div className="space-y-4">
@@ -199,26 +195,30 @@ export default function FarmerLayout({ children }: { children: React.ReactNode }
             </div>
           </div>
 
-          {/* Mobile Quick Stats */}
-          <div className="lg:hidden grid grid-cols-3 gap-4 mb-6">
-            <div className="bg-white rounded-xl shadow-sm p-4 text-center">
-              <div className="text-2xl font-bold text-green-600">{products.length}</div>
-              <div className="text-xs text-gray-600">{t('dashboard.activeListing')}</div>
-            </div>
-            <div className="bg-white rounded-xl shadow-sm p-4 text-center">
-              <div className="text-2xl font-bold text-orange-600">{products.reduce((sum: number, p: any) => sum + p.quantity, 0)}</div>
-              <div className="text-xs text-gray-600">{t('dashboard.totalStock')} (kg)</div>
-            </div>
-            <div className="bg-white rounded-xl shadow-sm p-4 text-center">
-              <div className="text-lg font-bold text-green-600">
-                ₹{products.length > 0 ? Math.round(products.reduce((sum: number, p: any) => sum + p.price_single, 0) / products.length) : 0}
+          {/* Mobile: quick stats on top only on overview */}
+          {isOverview && (
+            <div className="lg:hidden grid grid-cols-3 gap-3">
+              <div className="bg-white rounded-xl shadow-sm p-3 text-center">
+                <div className="text-xl font-bold text-green-600">{products.length}</div>
+                <div className="text-xs text-gray-600">{t('dashboard.activeListing')}</div>
               </div>
-              <div className="text-xs text-gray-600">{t('dashboard.avgPrice')}/kg</div>
+              <div className="bg-white rounded-xl shadow-sm p-3 text-center">
+                <div className="text-xl font-bold text-orange-600">
+                  {products.reduce((sum: number, p: any) => sum + p.quantity, 0)}
+                </div>
+                <div className="text-xs text-gray-600">{t('dashboard.totalStock')} (kg)</div>
+              </div>
+              <div className="bg-white rounded-xl shadow-sm p-3 text-center">
+                <div className="text-base font-bold text-green-600">
+                  ₹{products.length > 0 ? Math.round(products.reduce((sum: number, p: any) => sum + p.price_single, 0) / products.length) : 0}
+                </div>
+                <div className="text-xs text-gray-600">{t('dashboard.avgPrice')}/kg</div>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Main Content */}
-          <div className="flex-1">{children}</div>
+          <div className="flex-1 min-w-0">{children}</div>
         </div>
       </div>
       <VoiceAssistant role="farmer" />

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useI18n } from '@/lib/i18n/context';
-import { Package, Star, Phone, ImageIcon, QrCode } from 'lucide-react';
+import { Package, Star, Phone, ImageIcon, QrCode, Search } from 'lucide-react';
 import { useDashboardData, useOrders, useRatings } from '@/lib/hooks/useDashboardData';
 import RatingModal from '@/components/RatingModal';
 import OrderDetailsModal from '@/components/OrderDetailsModal';
@@ -19,6 +19,7 @@ export default function FarmerOrdersPage() {
   const [showRatingModal, setShowRatingModal] = useState(false);
   const [selectedOrderForRating, setSelectedOrderForRating] = useState<any>(null);
   const [orderRatings, setOrderRatings] = useState<{[key: number]: any}>({});
+  const [searchTerm, setSearchTerm] = useState('');
   const [showTrackingModal, setShowTrackingModal] = useState(false);
   const [selectedOrderForTracking, setSelectedOrderForTracking] = useState<any>(null);
 
@@ -95,13 +96,31 @@ export default function FarmerOrdersPage() {
   return (
     <>
       <div className="bg-white rounded-2xl shadow-sm p-4 lg:p-8">
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
           <div className="flex items-center">
-            <Package className="w-6 h-6 text-green-600 mr-3" />
+            <Package className="w-6 h-6 text-green-600 mr-3 shrink-0" />
             <h2 className="text-2xl font-bold text-gray-900">My Orders</h2>
           </div>
-          <div className="text-sm text-gray-600">
-            {orders.length} order{orders.length !== 1 ? 's' : ''}
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search by product, buyer, status..."
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+                className="pl-9 pr-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 outline-none text-sm w-56"
+              />
+            </div>
+            <span className="text-sm text-gray-500 shrink-0">
+              {orders.filter(o =>
+                !searchTerm ||
+                o.product?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                o.buyer?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                o.status?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                String(o.id).includes(searchTerm)
+              ).length} order{orders.length !== 1 ? 's' : ''}
+            </span>
           </div>
         </div>
 
@@ -109,15 +128,27 @@ export default function FarmerOrdersPage() {
           <div className="text-center py-8">
             <div className="text-gray-500">Loading orders...</div>
           </div>
-        ) : orders.length === 0 ? (
+        ) : orders.filter(o =>
+            !searchTerm ||
+            o.product?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            o.buyer?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            o.status?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            String(o.id).includes(searchTerm)
+          ).length === 0 ? (
           <div className="text-center py-12">
             <Package className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">{t('status.noOrdersYet')}</h3>
-            <p className="text-gray-500">{t('status.ordersWillAppear')}</p>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No orders match "{searchTerm}"</h3>
+            <button onClick={() => setSearchTerm('')} className="text-green-600 text-sm hover:underline">Clear search</button>
           </div>
         ) : (
           <div className="space-y-4">
-            {orders.map((order) => (
+            {orders.filter(o =>
+              !searchTerm ||
+              o.product?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+              o.buyer?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+              o.status?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+              String(o.id).includes(searchTerm)
+            ).map((order) => (
               <div key={order.id} className={`border-2 rounded-xl p-6 ${
                 order.status === 'pending'   ? 'border-yellow-300 bg-yellow-50/30' :
                 order.status === 'confirmed' ? 'border-blue-300 bg-blue-50/30' :
